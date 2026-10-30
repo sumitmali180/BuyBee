@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "About Us - Buybee Commerce";
+}
+
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5 pb-lg-4">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase mb-3" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                Our Story &amp; Vision
+            </span>
+            <h1 class="display-5 fw-bold text-dark mb-3">
+                Empowering Smart Commerce for Next-Gen Shoppers
+            </h1>
+            <p class="lead text-secondary mb-4">
+                Buybee Commerce combines cutting-edge AI shopping intelligence with a curated catalog of authentic, high-quality products across Electronics, Fashion, Home, and Essentials.
+            </p>
+            <div class="d-flex gap-3">
+                <a asp-controller="Products" asp-action="Index" class="btn btn-warning px-4 py-2.5 fw-bold text-dark shadow-sm">
+                    <i class="bi bi-bag-fill me-2"></i>Explore Products
+                </a>
+                <a asp-controller="Ai" asp-action="Index" class="btn btn-outline-dark px-4 py-2.5 fw-semibold">
+                    <i class="bi bi-stars text-warning me-2"></i>Meet BeeBot AI
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 shadow-sm border bg-light text-dark position-relative overflow-hidden">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="rounded-circle p-3 bg-warning text-dark d-flex align-items-center justify-content-center shadow-sm" style="width: 64px; height: 64px;">
+                        <i class="bi bi-lightning-charge-fill fs-2"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1">Instant Assistance</h4>
+                        <p class="text-secondary small mb-0">Powered by MCP Server &amp; Groq AI</p>
+                    </div>
+                </div>
+                <hr class="my-4 opacity-10" />
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <h3 class="fw-bold text-warning mb-0">100%</h3>
+                        <span class="small text-secondary">Genuine Stock</span>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="fw-bold text-warning mb-0">24/7</h3>
+                        <span class="small text-secondary">AI Concierge</span>
+                    </div>
+                    <div class="col-4">
+                        <h3 class="fw-bold text-warning mb-0">48h</h3>
+                        <span class="small text-secondary">Fast Dispatch</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Values -->
+    <div class="mb-5 py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-dark">Why Shoppers Love Buybee</h2>
+            <p class="text-secondary">Built on trust, speed, and AI-driven intelligence</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                    <div class="mx-auto mb-3 rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-shield-check fs-2 text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">100% Verified Quality</h5>
+                    <p class="text-secondary small mb-0">
+                        Every single item in our warehouse is thoroughly inspected and verified directly from authorized brand distributors.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                    <div class="mx-auto mb-3 rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-robot fs-2 text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Autonomous AI Search</h5>
+                    <p class="text-secondary small mb-0">
+                        Our Model Context Protocol (MCP) server allows BeeBot to analyze live inventory, check stock, and curate custom recommendations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                    <div class="mx-auto mb-3 rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-truck fs-2 text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Express Delivery</h5>
+                    <p class="text-secondary small mb-0">
+                        Orders are picked, packed, and expedited across India with live order tracking and verified courier dispatch.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

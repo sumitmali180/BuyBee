@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <g fill="#005CA9">
+    <!-- Stylized nest/tree motif -->
+    <path d="M30 38c0-8 6-14 14-14s14 6 14 14H30z" opacity="0.2"/>
+    <circle cx="40" cy="26" r="3"/>
+    <circle cx="48" cy="24" r="3.5"/>
+    <path d="M34 38c4-4 16-4 20 0z"/>
+  </g>
+  <text x="120" y="38" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-weight="bold" fill="#005CA9" text-anchor="middle" letter-spacing="1">Nestlé</text>
+</svg>

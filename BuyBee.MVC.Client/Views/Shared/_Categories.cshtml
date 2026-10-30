@@ -1,0 +1,46 @@
+@model IEnumerable<EMart.Models.Categories>
+
+@if (Model != null && Model.Any())
+{
+    <section class="py-5 bg-white border-bottom border-light">
+        <div class="container">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">Featured Categories</h2>
+                    <p class="text-muted mb-0 small">Browse products curated by category</p>
+                </div>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm align-self-start align-self-sm-center">
+                    All Categories <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+                @foreach (var category in Model.Where(c => c.IsActive))
+                {
+                    var catLower = category.CategoryName?.ToLower() ?? "";
+                    var iconClass = "bi-grid-fill";
+                    if (catLower.Contains("phone") || catLower.Contains("mobile")) { iconClass = "bi-phone"; }
+                    else if (catLower.Contains("elect") || catLower.Contains("tech")) { iconClass = "bi-laptop"; }
+                    else if (catLower.Contains("cloth") || catLower.Contains("fashion") || catLower.Contains("apparel")) { iconClass = "bi-bag-heart"; }
+                    else if (catLower.Contains("home") || catLower.Contains("furnit")) { iconClass = "bi-house-door"; }
+                    else if (catLower.Contains("groc") || catLower.Contains("food")) { iconClass = "bi-basket"; }
+                    else if (catLower.Contains("beauty") || catLower.Contains("health")) { iconClass = "bi-heart-pulse"; }
+
+                    <div class="col">
+                        <a asp-controller="Products"
+                           asp-action="Category"
+                           asp-route-id="@category.CategoryId"
+                           class="bb-cat-card h-100">
+                            <div class="bb-cat-icon">
+                                <i class="bi @iconClass"></i>
+                            </div>
+                            <span class="bb-cat-name text-truncate w-100">
+                                @category.CategoryName
+                            </span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

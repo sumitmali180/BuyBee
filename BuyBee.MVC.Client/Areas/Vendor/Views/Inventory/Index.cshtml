@@ -1,0 +1,157 @@
+@model BuyBee.MVC.Client.ViewModels.VendorInventoryViewModel
+
+@{
+    ViewData["Title"] = "Inventory & Restock Hub";
+}
+
+<div class="container-fluid px-0">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1">Inventory & Restock Hub</h1>
+            <p class="text-muted small mb-0">Monitor stock levels in real time, configure thresholds, and perform instant inline restocking.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-area="Vendor" asp-controller="Products" asp-action="Create" class="btn btn-vendor shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Product</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Pills & Search Bar -->
+    <div class="vendor-card p-3 mb-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <!-- Filter Tabs -->
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" asp-route-stockFilter="ALL" asp-route-searchTerm="@Model.SearchTerm"
+                   class="btn btn-sm rounded-pill px-3 fw-semibold @(Model.StockFilter == "ALL" ? "btn-dark" : "btn-light text-muted border")">
+                    All Items (@Model.TotalCount)
+                </a>
+                <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" asp-route-stockFilter="LOW" asp-route-searchTerm="@Model.SearchTerm"
+                   class="btn btn-sm rounded-pill px-3 fw-semibold @(Model.StockFilter == "LOW" ? "btn-warning text-dark" : "btn-light text-muted border")">
+                    <i class="bi bi-exclamation-circle me-1"></i> Low Stock (@Model.LowStockCount)
+                </a>
+                <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" asp-route-stockFilter="OUT" asp-route-searchTerm="@Model.SearchTerm"
+                   class="btn btn-sm rounded-pill px-3 fw-semibold @(Model.StockFilter == "OUT" ? "btn-danger text-white" : "btn-light text-muted border")">
+                    <i class="bi bi-x-circle me-1"></i> Out of Stock (@Model.OutOfStockCount)
+                </a>
+            </div>
+
+            <!-- Search Form -->
+            <form method="get" asp-area="Vendor" asp-controller="Inventory" asp-action="Index" class="d-flex gap-2" style="max-width: 320px;">
+                <input type="hidden" name="stockFilter" value="@Model.StockFilter" />
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control border-start-0" placeholder="Search product name..." />
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                    {
+                        <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" asp-route-stockFilter="@Model.StockFilter" class="btn btn-outline-secondary">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    }
+                    <button type="submit" class="btn btn-secondary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Table Card -->
+    <div class="vendor-card overflow-hidden">
+        @if (Model.Products == null || !Model.Products.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>
+                <h5 class="fw-bold text-dark mb-1">No products found matching filters</h5>
+                <p class="small mb-3">Try adjusting your search criteria or view all products.</p>
+                <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    Reset Filter
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted small text-uppercase">
+                        <tr>
+                            <th style="min-width: 250px;">Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Current Stock</th>
+                            <th>Threshold</th>
+                            <th style="min-width: 200px;">Quick Restock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Products)
+                        {
+                            <tr id="row-prod-@p.ProductId">
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="@(string.IsNullOrEmpty(p.PrimaryImage) ? "/images/product-placeholder.png" : p.PrimaryImage)" 
+                                             alt="@p.ProductName" 
+                                             class="rounded-3 object-fit-cover border" 
+                                             style="width: 48px; height: 48px;" 
+                                             onerror="this.src='/images/product-placeholder.png'" />
+                                        <div>
+                                            <a asp-area="Vendor" asp-controller="Products" asp-action="Edit" asp-route-id="@p.ProductId" class="fw-bold text-dark text-decoration-none">
+                                                @p.ProductName
+                                            </a>
+                                            <span class="text-muted small d-block">
+                                                @(string.IsNullOrEmpty(p.BrandName) ? "Unbranded" : p.BrandName) &bull; ID: #@p.ProductId
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@(p.CategoryName ?? "General")</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark">₹@p.Price.ToString("N2")</span>
+                                </td>
+                                <td>
+                                    @if (p.StockQuantity == 0)
+                                    {
+                                        <span class="badge bg-danger rounded-pill px-2 py-1" id="badge-stock-@p.ProductId">
+                                            <i class="bi bi-x-circle me-1"></i> Out of Stock (0)
+                                        </span>
+                                    }
+                                    else if (p.IsLowStock)
+                                    {
+                                        <span class="badge bg-warning text-dark rounded-pill px-2 py-1" id="badge-stock-@p.ProductId">
+                                            <i class="bi bi-exclamation-triangle me-1"></i> Low Stock (@p.StockQuantity)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1" id="badge-stock-@p.ProductId">
+                                            <i class="bi bi-check-circle me-1"></i> In Stock (@p.StockQuantity)
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-muted small">
+                                    &le; @p.LowStockThreshold units
+                                </td>
+                                <td>
+                                    <!-- Inline Restock Form -->
+                                    <form asp-area="Vendor" asp-controller="Inventory" asp-action="RestockForm" method="post" class="d-flex align-items-center gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@p.ProductId" />
+                                        <div class="input-group input-group-sm" style="max-width: 140px;">
+                                            <span class="input-group-text bg-light text-muted">+</span>
+                                            <input type="number" name="addQuantity" class="form-control text-center" value="10" min="1" max="5000" required />
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary rounded-2 d-inline-flex align-items-center gap-1">
+                                            <i class="bi bi-arrow-up-circle"></i> Restock
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,337 @@
+@model EMart.ViewModels.OrderVM
+
+@{
+    ViewData["Title"] = "Order Details - " + Model.Order.OrderNumber;
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Orders</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">@Model.Order.OrderNumber</li>
+                </ol>
+            </nav>
+            <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-receipt text-amber"></i>
+                <span>Order <span class="font-monospace">#@Model.Order.OrderNumber</span></span>
+            </h1>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="Order"
+               asp-action="Invoice"
+               asp-route-id="@Model.Order.OrderId"
+               target="_blank"
+               class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-printer"></i>
+                <span>Tax Invoice</span>
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left"></i>
+                <span>Back to Orders</span>
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <div>@TempData["Error"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Main: Information & Items -->
+        <div class="col-lg-8">
+            <!-- Order Metadata Strip -->
+            <div class="bb-card p-3 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3 bg-light border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-white border" style="width: 44px; height: 44px;">
+                        <i class="bi bi-clock-history text-muted fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="small text-muted">Placement Timestamp</div>
+                        <div class="fw-semibold text-dark">@Model.Order.OrderDate.ToString("dd MMM yyyy, hh:mm:ss tt")</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small text-muted">Payment:</span>
+                    <span class="badge bg-white text-dark border px-2 py-1">@Model.Order.PaymentMethod</span>
+                </div>
+            </div>
+
+            <!-- Ordered Items Table -->
+            <div class="bb-card p-0 overflow-hidden mb-4">
+                <div class="p-3 px-4 border-bottom bg-white d-flex align-items-center justify-content-between">
+                    <h2 class="h6 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-box-seam text-amber"></i>
+                        <span>Line Items</span>
+                    </h2>
+                    <span class="badge bg-light text-secondary border">@Model.OrderDetails.Count items</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light small text-uppercase text-muted">
+                            <tr>
+                                <th class="ps-4 py-3">Product</th>
+                                <th class="py-3 text-center">Unit Price</th>
+                                <th class="py-3 text-center">Qty</th>
+                                <th class="pe-4 py-3 text-end">Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderDetails)
+                            {
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="fw-semibold text-dark">@item.ProductName</div>
+                                        <div class="d-flex align-items-center gap-2 mt-1">
+                                            @if (!string.IsNullOrEmpty(item.VendorStoreName))
+                                            {
+                                                <span class="badge bg-indigo bg-opacity-10 text-primary border border-primary border-opacity-25" style="font-size: 0.72rem;">
+                                                    <i class="bi bi-shop me-1"></i> Sold by: @item.VendorStoreName
+                                                </span>
+                                            }
+                                            <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">
+                                                Status: @item.ItemStatus
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-center text-muted">
+                                        ₹@item.UnitPrice.ToString("N2")
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        <span class="badge bg-light text-dark border px-2 py-1">@item.Quantity</span>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end fw-bold text-dark">
+                                        ₹@item.Total.ToString("N2")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Delivery Destination Card -->
+            @if (Model.Address != null)
+            {
+                <div class="bb-card p-4">
+                    <h2 class="h6 fw-bold mb-3 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-geo-alt text-amber"></i>
+                        <span>Delivery Destination</span>
+                    </h2>
+                    <div class="p-3 bg-light rounded-3">
+                        <div class="fw-semibold text-dark mb-1">Customer Delivery Address</div>
+                        <div class="text-secondary">@Model.Address.AddressLine1</div>
+                        <div class="text-secondary">@Model.Address.City, @Model.Address.State</div>
+                        <div class="text-muted small mt-1 font-monospace">PIN: @Model.Address.Pincode</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar: Status Manager & Financials -->
+        <div class="col-lg-4">
+            <!-- Delivery Partner Assignment (Dispatch) -->
+            <div class="bb-card p-4 mb-4 border-success border-opacity-50">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <h2 class="h6 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-truck text-success"></i>
+                        <span>Delivery Dispatch</span>
+                    </h2>
+                    @if (Model.Order.DeliveryPartnerId.HasValue)
+                    {
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill small">Assigned</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill small">Unassigned</span>
+                    }
+                </div>
+
+                @if (Model.Order.DeliveryPartnerId.HasValue)
+                {
+                    <div class="bg-light p-3 rounded-3 mb-3 small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Assigned Rider:</span>
+                            <strong class="text-dark">@(Model.Order.DeliveryPartnerName ?? $"Partner #{Model.Order.DeliveryPartnerId}")</strong>
+                        </div>
+                        @if (Model.Order.AssignedAt.HasValue)
+                        {
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Assigned At:</span>
+                                <span>@Model.Order.AssignedAt.Value.ToString("dd MMM, hh:mm tt")</span>
+                            </div>
+                        }
+                        @if (Model.Order.DeliveredAt.HasValue)
+                        {
+                            <div class="d-flex justify-content-between text-success fw-semibold">
+                                <span>Delivered At:</span>
+                                <span>@Model.Order.DeliveredAt.Value.ToString("dd MMM, hh:mm tt")</span>
+                            </div>
+                        }
+                        @if (Model.Order.DeliveryAttempts > 0)
+                        {
+                            <div class="d-flex justify-content-between text-danger">
+                                <span>Attempts:</span>
+                                <span>@Model.Order.DeliveryAttempts</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Order.FailedReason))
+                            {
+                                <div class="text-danger small mt-1">Issue: @Model.Order.FailedReason</div>
+                            }
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Order.DeliveryNotes))
+                        {
+                            <div class="text-muted small mt-1">Notes: @Model.Order.DeliveryNotes</div>
+                        }
+                    </div>
+                }
+
+                @if (Model.Order.OrderStatus != "Delivered")
+                {
+                    var availableDrivers = ViewBag.AvailableDrivers as List<EMart.ViewModels.DriverOptionVM> ?? new List<EMart.ViewModels.DriverOptionVM>();
+
+                    <form asp-area="Admin" asp-controller="Order" asp-action="AssignDriver" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
+
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-semibold">
+                                @(Model.Order.DeliveryPartnerId.HasValue ? "Reassign Delivery Partner" : "Select Delivery Partner")
+                            </label>
+                            <select name="deliveryPartnerId" class="form-select form-select-sm" required>
+                                <option value="">-- Choose Partner --</option>
+                                @foreach (var driver in availableDrivers)
+                                {
+                                    <option value="@driver.UserId" selected="@(Model.Order.DeliveryPartnerId == driver.UserId)">
+                                        @driver.FullName (@driver.Email)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-semibold">Dispatch / Route Notes (Optional)</label>
+                            <input type="text" name="deliveryNotes" class="form-control form-control-sm" placeholder="e.g. Priority delivery / Handle with care" />
+                        </div>
+
+                        <button type="submit" class="btn btn-sm btn-success w-100 fw-semibold d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-person-check-fill"></i>
+                            <span>@(Model.Order.DeliveryPartnerId.HasValue ? "Update Assignment" : "Assign & Dispatch")</span>
+                        </button>
+                    </form>
+                }
+            </div>
+
+            <!-- Status Update Widget -->
+            <div class="bb-card p-4 mb-4">
+                <h2 class="h6 fw-bold mb-3 pb-2 border-bottom text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-sliders text-amber"></i>
+                    <span>Manage Order Status</span>
+                </h2>
+
+                <form asp-area="Admin" asp-controller="Order" asp-action="UpdateStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-semibold">Current State</label>
+                        <select name="orderStatus" class="form-select">
+                            <option value="Pending" selected="@(Model.Order.OrderStatus == "Pending")">Pending</option>
+                            <option value="Confirmed" selected="@(Model.Order.OrderStatus == "Confirmed")">Confirmed</option>
+                            <option value="Processing" selected="@(Model.Order.OrderStatus == "Processing")">Processing</option>
+                            <option value="Dispatched" selected="@(Model.Order.OrderStatus == "Dispatched" || Model.Order.OrderStatus == "Shipped")">Dispatched / Shipped</option>
+                            <option value="Out for Delivery" selected="@(Model.Order.OrderStatus == "Out for Delivery")">Out for Delivery</option>
+                            <option value="Delivered" selected="@(Model.Order.OrderStatus == "Delivered")">Delivered</option>
+                            <option value="Cancelled" selected="@(Model.Order.OrderStatus == "Cancelled")">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-semibold">Carrier / Courier Partner</label>
+                        <input type="text" name="carrierName" value="@Model.Order.CarrierName" class="form-control form-control-sm" placeholder="e.g. Buybee Express, BlueDart, Delhivery" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-semibold">Tracking / AWB Number</label>
+                        <input type="text" name="trackingNumber" value="@Model.Order.TrackingNumber" class="form-control form-control-sm" placeholder="e.g. BB-EXP-889123" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Order.DeliveryOtp))
+                    {
+                        <div class="p-2 mb-3 bg-light rounded-2 border d-flex align-items-center justify-content-between">
+                            <span class="small text-muted fw-semibold"><i class="bi bi-shield-lock me-1"></i> Delivery OTP:</span>
+                            <span class="badge bg-dark font-monospace fs-6 px-2 py-1">@Model.Order.DeliveryOtp</span>
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 d-inline-flex align-items-center justify-content-center gap-2 shadow-sm">
+                        <i class="bi bi-check-circle"></i>
+                        <span>Update Shipment & Status</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Financial Summary -->
+            <div class="bb-card p-4">
+                <h2 class="h6 fw-bold mb-3 pb-2 border-bottom text-dark">Financial Summary</h2>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Items Subtotal</span>
+                    <span class="fw-medium text-dark">₹@Model.Order.SubTotal.ToString("N2")</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Shipping Fees</span>
+                    <span class="text-success small fw-semibold">FREE</span>
+                </div>
+
+                @if (Model.Order.DiscountAmount > 0)
+                {
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Promotional Discount</span>
+                        <span class="text-danger small fw-medium">- ₹@Model.Order.DiscountAmount.ToString("N2")</span>
+                    </div>
+                }
+
+                @if (Model.Order.CoinsRedeemed > 0)
+                {
+                    <div class="d-flex justify-content-between mb-2 text-warning-emphasis">
+                        <span class="small"><i class="bi bi-coin text-warning me-1"></i> BeeCoins Redeemed (@Model.Order.CoinsRedeemed)</span>
+                        <span class="small fw-bold">- ₹@Model.Order.CoinsDiscount.ToString("N2")</span>
+                    </div>
+                }
+
+                @if (Model.Order.CoinsEarned > 0)
+                {
+                    <div class="p-2 bg-warning bg-opacity-10 rounded-2 mb-3 d-flex justify-content-between align-items-center border border-warning border-opacity-25">
+                        <span class="small text-warning-emphasis fw-medium"><i class="bi bi-stars text-warning me-1"></i> BeeCoins Cashback:</span>
+                        <span class="badge bg-warning text-dark fw-bold">+@Model.Order.CoinsEarned Coins</span>
+                    </div>
+                }
+
+                <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-dark">Grand Total</span>
+                    <span class="fs-4 fw-extrabold text-amber">₹@Model.Order.GrandTotal.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

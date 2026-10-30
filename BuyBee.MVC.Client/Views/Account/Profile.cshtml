@@ -1,0 +1,104 @@
+@model EMart.ViewModels.CustomerAccountVM
+
+@{
+    ViewData["Title"] = "My Account Profile";
+}
+
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb mb-0 small text-muted">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Account Profile</li>
+                </ol>
+            </nav>
+
+            <div class="bb-card overflow-hidden">
+                <!-- Profile Header Banner -->
+                <div class="p-4 p-md-5 bg-dark text-white position-relative">
+                    <div class="d-flex flex-wrap align-items-center gap-4">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-white text-dark shadow fw-bold fs-2 border" style="width: 72px; height: 72px;">
+                            @(string.IsNullOrWhiteSpace(Model.FullName) ? "U" : Model.FullName.Substring(0, 1).ToUpper())
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h1 class="h3 fw-bold mb-0 text-white">@Model.FullName</h1>
+                                @if (Model.IsActive)
+                                {
+                                    <span class="bb-badge bb-badge-emerald px-2 py-0">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="bb-badge bb-badge-rose px-2 py-0">Inactive</span>
+                                }
+                            </div>
+                            <p class="text-light text-opacity-75 small mb-0">@Model.Email</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Data Body -->
+                <div class="p-4 p-md-5">
+                    <h2 class="h6 fw-bold text-uppercase text-muted tracking-wider mb-3">Account Details</h2>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="small text-muted d-block">Full Legal Name</span>
+                                <span class="fw-semibold text-dark">@Model.FullName</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="small text-muted d-block">Registered Email</span>
+                                <span class="fw-semibold text-dark">@Model.Email</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="small text-muted d-block">Customer Identification</span>
+                                <span class="fw-semibold text-dark font-monospace">#@Model.CustomerId</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="small text-muted d-block">Account Status</span>
+                                <span class="fw-semibold @(Model.IsActive ? "text-success" : "text-danger")">
+                                    <i class="bi @(Model.IsActive ? "bi-check-circle" : "bi-x-circle") me-1"></i>
+                                    @(Model.IsActive ? "Verified and Active" : "Suspended / Inactive")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="h6 fw-bold text-uppercase text-muted tracking-wider mb-3">Quick Navigation</h2>
+                    <div class="d-flex flex-wrap gap-2 pt-1">
+                        <a asp-area="" asp-controller="Order" asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-box-seam"></i>
+                            <span>My Orders</span>
+                        </a>
+
+                        <a asp-area="" asp-controller="Address" asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Saved Addresses</span>
+                        </a>
+
+                        <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-bag"></i>
+                            <span>Shopping Bag</span>
+                        </a>
+
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="ms-auto">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm px-3 d-inline-flex align-items-center gap-2">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sign Out</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

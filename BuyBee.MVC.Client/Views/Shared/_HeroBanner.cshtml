@@ -1,0 +1,89 @@
+<!-- Buybee Hero Section -->
+<section class="position-relative overflow-hidden py-5 mb-5" style="background: linear-gradient(135deg, #18181B 0%, #121214 60%, #1F1E1B 100%);">
+    <!-- Subtle Honeycomb Background Pattern -->
+    <div class="position-absolute top-0 end-0 h-100 w-100 opacity-10 pointer-events-none" style="background-image: radial-gradient(#f59e0b 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+    <div class="container position-relative z-1 py-lg-4">
+        <div class="row align-items-center g-5">
+            <!-- Left Value Prop Column -->
+            <div class="col-lg-6 text-white text-center text-lg-start">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3 border border-secondary border-opacity-50" style="background-color: rgba(255, 255, 255, 0.06);">
+                    <img src="~/images/buybee-mascot-icon.png" alt="Buybee" width="20" height="20" class="rounded-circle shadow-sm" />
+                    <span class="small text-light fw-medium">Exclusive Season Sale is Live</span>
+                </div>
+
+                <h1 class="display-4 fw-extrabold text-white mb-3" style="letter-spacing: -0.03em; line-height: 1.15;">
+                    Smart Shopping.<br />
+                    <span class="text-warning">Unbeatable Buzz.</span>
+                </h1>
+
+                <p class="lead text-white mb-4 pe-lg-4" style="font-size: 1.1rem; line-height: 1.6;">
+                    Discover authentic smartphones, electronics, apparel, and lifestyle essentials with verified quality and lightning-fast doorstep delivery.
+                </p>
+
+                <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 mb-4">
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-bag-fill"></i>
+                        Explore Products
+                    </a>
+                    <a asp-controller="Products" asp-action="Index" asp-route-sortBy="price_asc" class="btn btn-outline-secondary btn-lg px-4 text-white border-secondary">
+                        <i class="bi bi-tag-fill text-warning"></i>
+                        View Deals
+                    </a>
+                </div>
+
+                <!-- Trust Micro Badges -->
+                <div class="d-flex flex-wrap justify-content-center justify-content-lg-start align-items-center gap-4 pt-2 border-top border-secondary border-opacity-25 text-secondary small">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check2-circle text-warning fs-5"></i>
+                        <span class="text-light">100% Authentic Brands</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-truck text-warning fs-5"></i>
+                        <span class="text-light">Free Delivery > ₹999</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-clockwise text-warning fs-5"></i>
+                        <span class="text-light">Easy 7-Day Returns</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Visual Banner Card -->
+            <div class="col-lg-6">
+                <div class="position-relative mx-auto" style="max-width: 520px;">
+                    <!-- Floating Highlight Tag -->
+                    <div class="position-absolute top-0 start-0 translate-middle-y ms-3 p-3 bg-white text-dark rounded-3 shadow-lg z-2 d-none d-sm-flex align-items-center gap-2 border">
+                        <div class="rounded-circle bg-warning bg-opacity-20 p-2 text-warning">
+                            <i class="bi bi-percent fs-5 text-dark"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold small mb-0">Up to 50% Off</div>
+                            <small class="text-muted">Top Tech & Essentials</small>
+                        </div>
+                    </div>
+
+                    <!-- Main Hero Image Showcase -->
+                    <div class="rounded-4 overflow-hidden shadow-lg border border-secondary border-opacity-25 bg-dark p-2">
+                        <img src="~/images/banners/banner1.jpg"
+                             class="img-fluid rounded-3 w-100"
+                             style="max-height: 400px; object-fit: cover;"
+                             asp-append-version="true"
+                             alt="Buybee Featured Collections" />
+                    </div>
+
+                    <!-- Floating Fast Delivery Badge -->
+                    <div class="position-absolute bottom-0 end-0 translate-middle-y me-3 p-3 bg-dark text-white rounded-3 shadow-lg z-2 d-none d-sm-flex align-items-center gap-2 border border-secondary">
+                        <div class="rounded-circle bg-warning p-2 text-dark">
+                            <i class="bi bi-box-seam-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold small mb-0 text-white">Express Dispatch</div>
+                            <small class="text-secondary">Ready to ship today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

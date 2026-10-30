@@ -1,0 +1,76 @@
+@model EMart.ViewModels.UserVM
+
+@{
+    ViewData["Title"] = "Delete User - " + Model.FullName;
+}
+
+<div class="container-fluid px-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1 small text-muted">
+                            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Users</a></li>
+                            <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Delete</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-trash text-danger"></i>
+                        <span>Delete Staff User</span>
+                    </h1>
+                </div>
+
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Cancel</span>
+                </a>
+            </div>
+
+            <div class="bb-card p-4 p-md-5">
+                <div class="alert alert-danger d-flex align-items-center gap-3 mb-4 rounded-3 p-3">
+                    <i class="bi bi-exclamation-triangle-fill fs-3 text-danger"></i>
+                    <div>
+                        <h5 class="fw-bold mb-1">Confirm Account Deletion</h5>
+                        <p class="small mb-0">Are you sure you want to permanently delete this user account? The user will immediately lose access to the portal.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-3 mb-4">
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">User ID</span>
+                        <span class="fw-semibold text-dark font-monospace">#@Model.UserId</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Full Name</span>
+                        <span class="fw-bold text-dark">@Model.FullName</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Email Address</span>
+                        <span class="fw-medium text-dark font-monospace">@Model.Email</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Role</span>
+                        <span class="badge bg-light text-dark border">@Model.RoleName</span>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="UserId" type="hidden" />
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-trash"></i>
+                            <span>Confirm Delete</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

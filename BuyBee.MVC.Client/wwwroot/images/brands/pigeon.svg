@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <circle cx="44" cy="30" r="16" fill="#F9A01B"/>
+  <circle cx="44" cy="30" r="11" fill="#ED1C24"/>
+  <text x="120" y="38" font-family="Arial, sans-serif" font-size="22" font-weight="900" font-style="italic" fill="#ED1C24" text-anchor="middle" letter-spacing="1">Pigeon</text>
+</svg>

@@ -1,0 +1,305 @@
+@model List<EMart.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Shopping Bag - Buybee";
+}
+
+<div class="container py-4 py-md-5">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 pb-2 border-bottom">
+        <div>
+            <h1 class="h2 fw-bold mb-1 d-flex align-items-center gap-2">
+                <i class="bi bi-bag-check text-warning"></i>
+                Shopping Bag
+            </h1>
+            <p class="text-muted small mb-0">
+                You have <strong>@(Model?.Count ?? 0)</strong> unique item(s) in your bag
+            </p>
+        </div>
+
+        <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm align-self-start align-self-sm-center">
+            <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        var subtotal = Model.Sum(x => x.Total);
+        decimal shipping = subtotal >= 999 ? 0 : 99;
+        decimal grandTotal = subtotal + shipping;
+
+        <div class="row g-4">
+            <!-- Left Items List -->
+            <div class="col-lg-8">
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var item in Model)
+                    {
+                        <div class="card border p-3">
+                            <div class="row align-items-center g-3">
+                                <!-- Image -->
+                                <div class="col-3 col-sm-2 text-center">
+                                    <img src="@(string.IsNullOrEmpty(item.ThumbnailImage) ? "/images/no-image.png" : item.ThumbnailImage)"
+                                         class="rounded-3 border p-1 bg-light img-fluid object-fit-contain"
+                                         style="height: 80px; width: 80px;"
+                                         alt="@item.ProductName" />
+                                </div>
+
+                                <!-- Info -->
+                                <div class="col-9 col-sm-5">
+                                    <h2 class="h6 fw-bold mb-1 text-truncate" title="@item.ProductName">
+                                        @item.ProductName
+                                    </h2>
+                                    <div class="small text-muted mb-2">
+                                        Unit Price: <span class="fw-semibold text-dark">₹@item.Price.ToString("N2")</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-success bg-opacity-10 text-success small">In Stock</span>
+                                        <span class="text-muted small">• Free Shipping Eligible</span>
+                                    </div>
+                                </div>
+
+                                <!-- Quantity Controls -->
+                                <div class="col-6 col-sm-3">
+                                    <form asp-action="UpdateQuantity" asp-controller="Cart" method="post" class="d-flex align-items-center gap-1">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="cartId" value="@item.CartId" />
+                                        <div class="input-group input-group-sm qty-group" style="max-width: 120px;">
+                                            <button class="btn btn-outline-secondary qty-btn-minus" type="button">-</button>
+                                            <input type="number"
+                                                   name="quantity"
+                                                   value="@item.Quantity"
+                                                   min="1"
+                                                   class="form-control text-center qty-input fw-bold px-1" />
+                                            <button class="btn btn-outline-secondary qty-btn-plus" type="button">+</button>
+                                        </div>
+                                        <button class="btn btn-light btn-sm border" type="submit" title="Apply quantity update">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Item Total & Actions -->
+                                <div class="col-6 col-sm-2 text-end">
+                                    <div class="fw-bold fs-6 text-dark mb-2">
+                                        ₹@item.Total.ToString("N2")
+                                    </div>
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <form asp-controller="Cart" asp-action="MoveToWishlist" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="cartId" value="@item.CartId" />
+                                            <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <button type="submit"
+                                                    class="btn btn-outline-warning text-dark btn-sm p-1 px-2 shadow-none"
+                                                    title="Save for Later (Move to Wishlist)">
+                                                <i class="bi bi-heart"></i>
+                                            </button>
+                                        </form>
+                                        <a asp-action="Remove"
+                                           asp-route-cartId="@item.CartId"
+                                           onclick="return confirm('Remove @item.ProductName from your bag?');"
+                                           class="btn btn-outline-danger btn-sm p-1 px-2 shadow-none"
+                                           title="Remove item">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Bottom Cart Action Strip -->
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
+                    <a asp-action="ClearCart"
+                       onclick="return confirm('Are you sure you want to empty your entire bag?');"
+                       class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash3 me-1"></i> Clear Shopping Bag
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Summary Column -->
+            <div class="col-lg-4">
+                <div class="card border p-4" style="position: sticky; top: 85px;">
+                    <h3 class="h5 fw-bold mb-3 pb-2 border-bottom text-dark">Order Summary</h3>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span class="fw-bold text-dark">₹@subtotal.ToString("N2")</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Delivery</span>
+                        @if (shipping == 0)
+                        {
+                            <span class="badge bg-success">FREE</span>
+                        }
+                        else
+                        {
+                            <span class="fw-bold text-dark">₹@shipping.ToString("N2")</span>
+                        }
+                    </div>
+
+                    @if (subtotal < 999)
+                    {
+                        var diff = 999 - subtotal;
+                        <div class="p-2 bg-light rounded-2 border my-2 small text-muted">
+                            <i class="bi bi-info-circle text-warning me-1"></i>
+                            Add <strong>₹@diff.ToString("N2")</strong> more to qualify for <strong>FREE shipping</strong>.
+                        </div>
+                    }
+
+                    <!-- Promo Code / Coupon Section -->
+                    <div class="my-3 pt-2 border-top">
+                        <label class="form-label small fw-bold text-dark d-flex justify-content-between align-items-center mb-2">
+                            <span><i class="bi bi-tag-fill text-warning me-1"></i> Have a Promo Code?</span>
+                            <span class="text-muted fw-normal" style="font-size: 11px;">Try: WELCOME10, FLAT200</span>
+                        </label>
+                        <div id="couponInputContainer">
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="cartCouponInput" class="form-control text-uppercase" placeholder="ENTER CODE" maxlength="30" />
+                                <button class="btn btn-dark px-3 fw-semibold" type="button" id="btnApplyCoupon">Apply</button>
+                            </div>
+                        </div>
+                        <div id="couponAppliedBox" class="p-2 mt-2 bg-success bg-opacity-10 rounded-2 border border-success d-none justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> APPLIED</span>
+                                <span class="fw-bold text-dark small" id="appliedCouponCodeText"></span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-danger fw-bold small" id="appliedCouponDiscountText">-₹0.00</span>
+                                <button type="button" class="btn btn-link text-danger p-0 ms-1 text-decoration-none" id="btnRemoveCoupon" title="Remove coupon">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="couponMessage" class="small mt-1 d-none"></div>
+                    </div>
+
+                    <!-- Discount row in summary -->
+                    <div id="discountRow" class="d-flex justify-content-between align-items-center mb-2 text-danger d-none">
+                        <span>Coupon Discount</span>
+                        <span class="fw-bold" id="cartDiscountAmount">-₹0.00</span>
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <div class="d-flex justify-content-between align-items-baseline mb-4">
+                        <span class="fw-bold text-dark fs-6">Estimated Total</span>
+                        <span class="display-6 fw-bold text-dark" id="cartGrandTotalText" style="font-size: 1.6rem;">
+                            ₹@grandTotal.ToString("N2")
+                        </span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary btn-lg w-100">
+                            Proceed to Checkout <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                        <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm w-100">
+                            Continue Shopping
+                        </a>
+                    </div>
+
+                    <!-- Trust assurance -->
+                    <div class="pt-3 mt-3 border-top text-center text-muted small">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i>
+                        Safe & encrypted 256-Bit checkout
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Empty Cart State -->
+        <div class="card border p-5 text-center my-4 bg-white">
+            <div class="mb-3">
+                <i class="bi bi-bag-x text-warning" style="font-size: 4rem;"></i>
+            </div>
+            <h2 class="h4 fw-bold mb-2">Your Shopping Bag is Empty</h2>
+            <p class="text-muted small mb-4">
+                Looks like you haven't added anything to your bag yet. Discover trending deals and items!
+            </p>
+            <div>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-grid me-1"></i> Start Shopping
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Check if coupon is already active in session
+            $.get('/Coupon/Current', function (res) {
+                if (res && res.hasCoupon) {
+                    showAppliedCoupon(res.code, res.discountFormatted, res.discount);
+                }
+            });
+
+            $('#btnApplyCoupon').on('click', function () {
+                var code = $('#cartCouponInput').val().trim();
+                if (!code) {
+                    showCouponMsg('Please enter a coupon code.', 'text-danger');
+                    return;
+                }
+
+                var btn = $(this);
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+                $.ajax({
+                    url: '/Coupon/Apply',
+                    type: 'POST',
+                    data: { code: code },
+                    success: function (res) {
+                        btn.prop('disabled', false).text('Apply');
+                        if (res.success) {
+                            showAppliedCoupon(res.code, res.discountFormatted, res.discount);
+                            $('#cartGrandTotalText').text(res.newTotalFormatted);
+                            showCouponMsg(res.message, 'text-success');
+                        } else {
+                            showCouponMsg(res.message, 'text-danger');
+                        }
+                    },
+                    error: function () {
+                        btn.prop('disabled', false).text('Apply');
+                        showCouponMsg('Unable to apply coupon. Please try again.', 'text-danger');
+                    }
+                });
+            });
+
+            $('#btnRemoveCoupon').on('click', function () {
+                $.post('/Coupon/Remove', function (res) {
+                    if (res.success) {
+                        $('#couponAppliedBox').addClass('d-none').removeClass('d-flex');
+                        $('#couponInputContainer').show();
+                        $('#cartCouponInput').val('');
+                        $('#discountRow').addClass('d-none');
+                        $('#cartGrandTotalText').text(res.subtotalFormatted);
+                        showCouponMsg('Coupon removed.', 'text-muted');
+                    }
+                });
+            });
+
+            function showAppliedCoupon(code, discountFormatted, discountVal) {
+                $('#couponInputContainer').hide();
+                $('#couponAppliedBox').removeClass('d-none').addClass('d-flex');
+                $('#appliedCouponCodeText').text(code);
+                $('#appliedCouponDiscountText').text('-' + discountFormatted);
+                $('#discountRow').removeClass('d-none');
+                $('#cartDiscountAmount').text('-' + discountFormatted);
+            }
+
+            function showCouponMsg(msg, cssClass) {
+                $('#couponMessage').removeClass('d-none text-danger text-success text-muted').addClass(cssClass).text(msg);
+                setTimeout(function () {
+                    if (cssClass === 'text-success') {
+                        $('#couponMessage').addClass('d-none');
+                    }
+                }, 4000);
+            }
+        });
+    </script>
+}

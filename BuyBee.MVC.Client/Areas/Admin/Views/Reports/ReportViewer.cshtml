@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] ??= "Report Viewer";
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Reports</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Viewer</li>
+                </ol>
+            </nav>
+            <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-bar-graph text-amber"></i>
+                <span>@ViewData["Title"]</span>
+            </h1>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Reports"
+           asp-action="Index"
+           class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i>
+            <span>Back to Reports</span>
+        </a>
+    </div>
+
+    <div class="bb-card p-0 overflow-hidden">
+        <iframe src="@ViewBag.ReportUrl"
+                width="100%"
+                height="850"
+                style="border: none; display: block;">
+        </iframe>
+    </div>
+</div>

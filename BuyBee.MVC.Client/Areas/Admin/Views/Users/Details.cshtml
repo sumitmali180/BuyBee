@@ -1,0 +1,77 @@
+@model EMart.ViewModels.UserVM
+
+@{
+    ViewData["Title"] = "User Details - " + Model.FullName;
+}
+
+<div class="container-fluid px-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1 small text-muted">
+                            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Users</a></li>
+                            <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Details</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-person text-amber"></i>
+                        <span>@Model.FullName</span>
+                    </h1>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-pencil"></i>
+                        <span>Edit</span>
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-left"></i>
+                        <span>Back</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bb-card p-4 p-md-5">
+                <h2 class="h6 fw-bold text-uppercase text-muted tracking-wider mb-4 pb-2 border-bottom">
+                    Staff User Profile
+                </h2>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">User ID</span>
+                        <span class="fw-semibold text-dark font-monospace">#@Model.UserId</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Full Name</span>
+                        <span class="fw-bold text-dark">@Model.FullName</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Email Address</span>
+                        <span class="fw-medium text-dark font-monospace">@Model.Email</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Assigned Role</span>
+                        <span class="badge bg-light text-dark border">@Model.RoleName</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Status</span>
+                        @if (Model.IsActive)
+                        {
+                            <span class="bb-badge bb-badge-emerald">Active Account</span>
+                        }
+                        else
+                        {
+                            <span class="bb-badge bb-badge-rose">Disabled Account</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Access Denied - Buybee Merchant Network";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied - Buybee Merchant Network</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center p-3">
+    <div class="card shadow-lg border-0 rounded-4 text-center p-4 p-md-5" style="max-width: 480px;">
+        <div class="mb-3">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle text-danger bg-danger bg-opacity-10 p-4" style="width: 80px; height: 80px;">
+                <i class="bi bi-shield-x fs-1"></i>
+            </div>
+        </div>
+        <h2 class="h4 fw-bold text-dark mb-2">Merchant Access Denied</h2>
+        <p class="text-muted mb-4 small">
+            Your account does not have permission to access the Vendor Merchant Portal. Only verified vendor partner accounts with role <code>Vendor</code> can view this workspace.
+        </p>
+        <div class="d-flex flex-column gap-2">
+            <a asp-area="Vendor" asp-controller="Account" asp-action="Login" class="btn btn-primary fw-bold py-2 rounded-3" style="background-color: #4f46e5; border-color: #4f46e5;">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign In With Vendor Credentials
+            </a>
+            <a href="/" class="btn btn-outline-secondary py-2 rounded-3">
+                <i class="bi bi-house me-1"></i> Return to Main Storefront
+            </a>
+        </div>
+    </div>
+</body>
+</html>

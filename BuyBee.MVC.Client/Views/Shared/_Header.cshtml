@@ -1,0 +1,269 @@
+@inject EMart.Repositories.Interfaces.ICategoriesRepository CategoriesRepo
+@inject EMart.Repositories.Interfaces.IWishlistRepository WishlistRepo
+@inject EMart.Repositories.Interfaces.IBeeCoinsRepository BeeCoinsRepo
+@{
+    var headerCategories = CategoriesRepo.GetAll()?.Where(c => c.IsActive).Take(8).ToList() ?? new List<EMart.Models.Categories>();
+    int headerWishlistCount = 0;
+    int headerBeeCoins = 0;
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var cidClaim = User.FindFirst("CustomerId")?.Value;
+        if (int.TryParse(cidClaim, out int cid) && cid > 0)
+        {
+            headerWishlistCount = await WishlistRepo.GetWishlistCount(cid);
+            var wallet = await BeeCoinsRepo.GetWallet(cid);
+            headerBeeCoins = wallet?.Balance ?? 0;
+        }
+    }
+}
+
+<header class="bb-header">
+    <!-- Top Announcement Strip -->
+    <div class="bb-topbar">
+        <div class="container d-flex flex-wrap justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-lightning-charge-fill text-warning"></i>
+                <span>Free Express Shipping on Orders Above <strong>₹999</strong></span>
+            </div>
+            <div class="d-none d-md-flex align-items-center gap-4">
+                <a href="tel:+919876543210" class="d-inline-flex align-items-center gap-1 text-decoration-none">
+                    <i class="bi bi-telephone text-warning"></i>
+                    <span>+91 9876543210</span>
+                </a>
+                <a href="mailto:support@buybee.com" class="d-inline-flex align-items-center gap-1 text-decoration-none">
+                    <i class="bi bi-envelope text-warning"></i>
+                    <span>support@buybee.com</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar navbar-expand-lg bb-navbar">
+        <div class="container">
+            <!-- Brand Logo -->
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index" aria-label="Buybee Home">
+                <img src="~/images/buybee-logo-full.png" asp-append-version="true" alt="Buybee" height="42" class="bb-brand-logo" />
+            </a>
+
+            <!-- Mobile Controls (Wishlist + Cart + Hamburger) -->
+            <div class="d-flex align-items-center gap-1 d-lg-none ms-auto me-2">
+                <a asp-area="" asp-controller="Wishlist" asp-action="Index" class="btn btn-outline-light border-0 text-dark position-relative p-2" aria-label="Wishlist">
+                    <i class="bi bi-heart fs-5 text-danger"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger bb-wishlist-badge @(headerWishlistCount > 0 ? "" : "d-none")" style="font-size: 10px;">
+                        @headerWishlistCount
+                    </span>
+                </a>
+                @await Component.InvokeAsync("Cart")
+            </div>
+
+            <button class="navbar-toggler border-0 p-2 shadow-none"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarMenu"
+                    aria-controls="navbarMenu"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <i class="bi bi-list fs-2 text-dark"></i>
+            </button>
+
+            <!-- Collapsible Navigation & Search -->
+            <div class="collapse navbar-collapse" id="navbarMenu">
+                <!-- Search Form -->
+                <form class="bb-search-form my-2 my-lg-0 mx-lg-auto"
+                      asp-controller="Products"
+                      asp-action="Index"
+                      method="get"
+                      role="search">
+                    <i class="bi bi-search bb-search-icon"></i>
+                    <input class="form-control bb-search-input"
+                           type="search"
+                           name="searchText"
+                           value="@Context.Request.Query["searchText"]"
+                           placeholder="Search smartphones, electronics, fashion..."
+                           aria-label="Search products" />
+                    <button class="btn btn-primary bb-search-btn" type="submit">
+                        Search
+                    </button>
+                </form>
+
+                <!-- Navigation Links -->
+                <ul class="navbar-nav align-items-lg-center ms-lg-3 gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link bb-nav-link" asp-controller="Home" asp-action="Index">
+                            Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link bb-nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu shadow-lg">
+                            @if (headerCategories.Any())
+                            {
+                                foreach (var cat in headerCategories)
+                                {
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Products"
+                                           asp-action="Category"
+                                           asp-route-id="@cat.CategoryId">
+                                            @cat.CategoryName
+                                        </a>
+                                    </li>
+                                }
+                                <li><hr class="dropdown-divider" /></li>
+                            }
+                            <li>
+                                <a class="dropdown-item fw-bold text-dark"
+                                   asp-controller="Products"
+                                   asp-action="Index">
+                                    Browse All Categories &rarr;
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link bb-nav-link" asp-controller="Products" asp-action="Index">
+                            Products
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link bb-nav-link"
+                           asp-controller="Products"
+                           asp-action="Index"
+                           asp-route-sortBy="newest">
+                            New In
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link bb-nav-link bb-nav-deal"
+                           asp-controller="Products"
+                           asp-action="Index"
+                           asp-route-sortBy="price_asc">
+                            <i class="bi bi-tag-fill me-1"></i>Deals
+                        </a>
+                    <li class="nav-item">
+                        <a class="nav-link bb-nav-link text-white" asp-controller="Reorder" asp-action="Index">
+                            <i class="bi bi-arrow-repeat text-warning me-1"></i>Reorder
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link bb-nav-link text-warning fw-bold d-inline-flex align-items-center gap-1"
+                           asp-controller="Ai"
+                           asp-action="Index">
+                            <i class="bi bi-stars"></i>
+                            <span>Ask AI</span>
+                            <span class="badge bg-dark text-warning border border-warning rounded-pill" style="font-size: 9px; padding: 2px 6px;">NEW</span>
+                        </a>
+                    </li>
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <!-- Desktop BeeCoins Pill -->
+                        <li class="nav-item d-none d-lg-block ms-lg-2">
+                            <a asp-area="" asp-controller="BeeCoins" asp-action="Index" class="btn btn-dark btn-sm border border-warning border-opacity-50 text-warning px-3 py-1 rounded-pill d-inline-flex align-items-center gap-1 text-decoration-none shadow-sm mt-1" title="Your BeeCoins Wallet">
+                                <span>🪙</span>
+                                <span class="fw-bold font-monospace">@headerBeeCoins</span>
+                                <span class="small text-white-50 d-none d-xl-inline">Coins</span>
+                            </a>
+                        </li>
+                    }
+
+                    <!-- Desktop Wishlist -->
+                    <li class="nav-item d-none d-lg-block ms-lg-2">
+                        <a asp-area="" asp-controller="Wishlist" asp-action="Index" class="bb-cart-btn text-decoration-none" aria-label="My Wishlist">
+                            <i class="bi bi-heart-fill fs-5 text-danger"></i>
+                            <span class="d-none d-xl-inline text-white">Wishlist</span>
+                            <span class="bb-cart-badge bg-danger bb-wishlist-badge @(headerWishlistCount > 0 ? "" : "d-none")">
+                                @headerWishlistCount
+                            </span>
+                        </a>
+                    </li>
+
+                    <!-- Desktop Cart -->
+                    <li class="nav-item d-none d-lg-block ms-lg-2">
+                        @await Component.InvokeAsync("Cart")
+                    </li>
+
+                    <!-- User Account / Auth -->
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item dropdown ms-lg-2">
+                            <a class="nav-link bb-nav-link dropdown-toggle d-flex align-items-center gap-1"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="bi bi-person-circle fs-5 text-warning"></i>
+                                <span class="fw-semibold">@User.Identity.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg">
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
+                                        <i class="bi bi-person me-2 text-warning"></i> My Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center" asp-area="" asp-controller="BeeCoins" asp-action="Index">
+                                        <span><span class="me-2">🪙</span> BeeCoins Rewards</span>
+                                        <span class="badge bg-warning text-dark font-monospace">@headerBeeCoins</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Reorder" asp-action="Index">
+                                        <i class="bi bi-arrow-repeat me-2 text-warning"></i> Smart Reorder Hub
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Wishlist" asp-action="Index">
+                                        <i class="bi bi-heart me-2 text-danger"></i> My Wishlist
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Order" asp-action="Index">
+                                        <i class="bi bi-box-seam me-2 text-warning"></i> My Orders
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Address" asp-action="Index">
+                                        <i class="bi bi-geo-alt me-2 text-warning"></i> Delivery Addresses
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-2">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger d-flex align-items-center">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item ms-lg-2 my-2 my-lg-0 d-flex gap-2">
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-box-arrow-in-right"></i> Sign In
+                            </a>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-sm">
+                                Register
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

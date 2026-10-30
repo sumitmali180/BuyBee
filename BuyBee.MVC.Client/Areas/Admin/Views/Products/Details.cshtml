@@ -1,0 +1,137 @@
+@model EMart.ViewModels.ProductVM
+
+@{
+    ViewData["Title"] = "Product Details - " + Model.Product.ProductName;
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Catalog</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Details</li>
+                </ol>
+            </nav>
+            <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-box-seam text-amber"></i>
+                <span>@Model.Product.ProductName</span>
+            </h1>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Product.ProductId" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-pencil"></i>
+                <span>Edit Product</span>
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left"></i>
+                <span>Back to Catalog</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Specs Information -->
+        <div class="col-lg-8">
+            <div class="bb-card p-4 p-md-5 mb-4">
+                <h2 class="h6 fw-bold text-uppercase text-muted tracking-wider mb-4 pb-2 border-bottom">
+                    Product Specification
+                </h2>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">SKU Identifier</span>
+                            <span class="fw-semibold text-dark font-monospace">@Model.Product.SKU</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">Catalog Status</span>
+                            @if (Model.Product.IsActive)
+                            {
+                                <span class="bb-badge bb-badge-emerald mt-1">Live & Active</span>
+                            }
+                            else
+                            {
+                                <span class="bb-badge bb-badge-rose mt-1">Inactive</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">Category</span>
+                            <span class="fw-semibold text-dark">@Model.Product.CategoryName</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">Sub Category</span>
+                            <span class="fw-semibold text-dark">@(string.IsNullOrEmpty(Model.Product.SubCategoryName) ? "Unspecified" : Model.Product.SubCategoryName)</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">Brand Partner</span>
+                            <span class="fw-semibold text-dark">@Model.Product.BrandName</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">Measurement Unit</span>
+                            <span class="fw-semibold text-dark">@Model.Product.UnitName</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">Unit Price</span>
+                            <span class="fw-bold text-amber fs-5">₹@Model.Product.Price?.ToString("N2")</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="small text-muted d-block">Current Stock</span>
+                            <span class="fw-bold text-dark fs-5 font-monospace">@Model.Product.Quantity units</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="h6 fw-bold text-uppercase text-muted tracking-wider mb-2">Description</h2>
+                <div class="p-3 bg-light rounded-3 text-secondary small line-clamp-none">
+                    @(string.IsNullOrWhiteSpace(Model.Product.Description) ? "No detailed description provided." : Model.Product.Description)
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Imagery -->
+        <div class="col-lg-4">
+            <div class="bb-card p-4">
+                <h2 class="h6 fw-bold text-uppercase text-muted tracking-wider mb-3 pb-2 border-bottom">
+                    Product Imagery
+                </h2>
+
+                @if (Model.ProductImages != null && Model.ProductImages.Any())
+                {
+                    <div class="row g-2">
+                        @foreach (var img in Model.ProductImages)
+                        {
+                            <div class="col-6">
+                                <div class="rounded-3 border overflow-hidden">
+                                    <img src="@img.ImagePath" class="w-100 object-fit-cover" style="height: 120px;" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-image fs-1 d-block mb-1"></i>
+                        No gallery photos uploaded.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

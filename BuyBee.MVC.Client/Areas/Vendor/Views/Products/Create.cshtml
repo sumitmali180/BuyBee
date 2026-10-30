@@ -1,0 +1,147 @@
+@model BuyBee.MVC.Client.ViewModels.VendorProductFormViewModel
+
+@{
+    ViewData["Title"] = "Add New Product";
+}
+
+<div class="container-fluid px-0" style="max-width: 900px;">
+    <!-- Breadcrumb -->
+    <div class="mb-3">
+        <a asp-area="Vendor" asp-controller="Products" asp-action="Index" class="text-decoration-none text-muted small">
+            <i class="bi bi-arrow-left me-1"></i> Back to Products
+        </a>
+    </div>
+
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1">Add New Product</h1>
+            <p class="text-muted small mb-0">Fill in the product specification, pricing, inventory, and upload high-res imagery.</p>
+        </div>
+        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 small fw-semibold">
+            <i class="bi bi-patch-check-fill me-1"></i> Auto-Approved
+        </span>
+    </div>
+
+    <div class="alert alert-info border-0 rounded-3 small p-3 mb-4 d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle-fill fs-5 text-primary flex-shrink-0"></i>
+        <div>
+            <strong>Instant Marketplace Publishing:</strong> As an authorized merchant vendor, your new products are automatically approved and made available to customers immediately upon creation.
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="vendor-card p-4 p-md-5">
+        <form asp-area="Vendor" asp-controller="Products" asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState[""]?.Errors.Count > 0)
+            {
+                <div class="alert alert-danger p-3 small rounded-3 mb-4">
+                    @Html.ValidationSummary(true)
+                </div>
+            }
+
+            <!-- 1. Basic Info -->
+            <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">1. Basic Information</h5>
+            
+            <div class="mb-3">
+                <label asp-for="ProductName" class="form-label fw-semibold small">Product Name <span class="text-danger">*</span></label>
+                <input asp-for="ProductName" class="form-control" placeholder="e.g. Sony WH-1000XM5 Wireless Headphones" required />
+                <span asp-validation-for="ProductName" class="text-danger small"></span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6">
+                    <label asp-for="CategoryId" class="form-label fw-semibold small">Category <span class="text-danger">*</span></label>
+                    <select asp-for="CategoryId" class="form-select" asp-items="@Model.Categories" required>
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label asp-for="SubCategoryId" class="form-label fw-semibold small">Sub Category</label>
+                    <select asp-for="SubCategoryId" class="form-select" asp-items="@Model.SubCategories">
+                        <option value="">-- Select Sub Category (Optional) --</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label asp-for="BrandId" class="form-label fw-semibold small">Brand</label>
+                    <select asp-for="BrandId" class="form-select" asp-items="@Model.Brands">
+                        <option value="">-- Select Brand (Optional) --</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label asp-for="UnitId" class="form-label fw-semibold small">Unit of Measure</label>
+                    <select asp-for="UnitId" class="form-select" asp-items="@Model.Units">
+                        <option value="">-- Select Unit (Optional) --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 2. Pricing & Inventory -->
+            <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">2. Pricing & Stock</h5>
+
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-4">
+                    <label asp-for="Price" class="form-label fw-semibold small">Selling Price (₹) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input asp-for="Price" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" required />
+                    </div>
+                    <span asp-validation-for="Price" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label asp-for="Quantity" class="form-label fw-semibold small">Stock Quantity <span class="text-danger">*</span></label>
+                    <input asp-for="Quantity" type="number" min="0" class="form-control" placeholder="10" required />
+                    <span asp-validation-for="Quantity" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label asp-for="LowStockThreshold" class="form-label fw-semibold small">Low Stock Alert Threshold</label>
+                    <input asp-for="LowStockThreshold" type="number" min="1" class="form-control" value="5" />
+                    <span class="text-muted" style="font-size: 0.72rem;">Alert triggers when stock drops below this number</span>
+                </div>
+            </div>
+
+            <!-- 3. Description -->
+            <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">3. Description & Details</h5>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label fw-semibold small">Product Description</label>
+                <textarea asp-for="Description" rows="4" class="form-control" placeholder="Highlight technical features, warranty, specifications, and package contents..."></textarea>
+            </div>
+
+            <!-- 4. Media Upload -->
+            <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">4. Product Images</h5>
+
+            <div class="mb-4">
+                <label asp-for="Images" class="form-label fw-semibold small">Upload Product Photos</label>
+                <input asp-for="Images" type="file" multiple class="form-control" accept="image/*" />
+                <span class="text-muted" style="font-size: 0.75rem;">Supported formats: JPG, PNG, WEBP. You can select multiple images.</span>
+            </div>
+
+            <!-- 5. Visibility -->
+            <div class="form-check form-switch mb-4">
+                <input class="form-check-input" type="checkbox" asp-for="IsActive" id="isActiveSwitch" checked>
+                <label class="form-check-label fw-semibold small" for="isActiveSwitch">
+                    Publish immediately and make visible to customers
+                </label>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
+                <a asp-area="Vendor" asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary px-4">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-vendor px-5 py-2">
+                    <i class="bi bi-cloud-upload me-1"></i> Publish Product
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

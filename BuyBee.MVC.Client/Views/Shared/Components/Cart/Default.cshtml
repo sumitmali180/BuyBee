@@ -1,0 +1,80 @@
+@model EMart.ViewModels.MiniCartVM
+
+<div class="dropdown">
+    <a class="bb-cart-btn"
+       href="/Cart"
+       role="button"
+       data-bs-toggle="dropdown"
+       aria-expanded="false"
+       aria-label="Shopping Cart">
+        <i class="bi bi-bag-check-fill fs-5 text-warning"></i>
+        <span class="d-none d-sm-inline">Cart</span>
+        <span id="cartCount" class="bb-cart-badge">
+            @Model.CartCount
+        </span>
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-end p-3 shadow-lg" style="width: 340px; max-width: 90vw;">
+        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+            <span class="fw-bold text-dark">Shopping Bag</span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-dark border">@Model.CartCount items</span>
+                <a asp-controller="Cart" asp-action="Index" class="small text-decoration-none fw-semibold text-warning" title="Open cart page">
+                    Full Cart &rarr;
+                </a>
+            </div>
+        </div>
+
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            <div class="cart-items-scroll pe-1" style="max-height: 240px; overflow-y: auto;">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom border-light">
+                        <img src="@(string.IsNullOrEmpty(item.ThumbnailImage) ? "/images/no-image.png" : item.ThumbnailImage)"
+                             width="48"
+                             height="48"
+                             class="rounded-2 border object-fit-contain p-1 bg-light"
+                             alt="@item.ProductName"
+                             onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="fw-semibold text-truncate small text-dark" title="@item.ProductName">
+                                @item.ProductName
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted">Qty: @item.Quantity</small>
+                                <span class="fw-bold text-dark small">₹@(item.Price.ToString("N2"))</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                <span class="text-muted small">Subtotal</span>
+                <span class="fw-bold fs-6 text-dark">₹@Model.GrandTotal.ToString("N2")</span>
+            </div>
+
+            <div class="d-grid mt-3">
+                <a asp-controller="Cart" asp-action="Index" class="btn btn-warning btn-sm w-100 fw-bold text-dark shadow-sm">
+                    View Cart & Checkout
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-bag-x fs-1 text-secondary opacity-50 d-block mb-2"></i>
+                <p class="small mb-3">Your shopping bag is empty</p>
+                <div class="d-flex flex-column gap-2">
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-warning btn-sm fw-semibold text-dark shadow-sm">
+                        Discover Products
+                    </a>
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        View Full Cart
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

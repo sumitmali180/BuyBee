@@ -1,0 +1,120 @@
+@model IEnumerable<EMart.Models.Brands>
+
+@{
+    ViewData["Title"] = "Brand Partners";
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-bricks text-amber"></i>
+                <span>Brand Partners</span>
+            </h1>
+            <p class="text-muted small mb-0">Manage authorized manufacturer and merchant partner brands with logos</p>
+        </div>
+
+        <a asp-action="Create" class="btn btn-primary d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>Add Brand</span>
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="bb-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+                <thead class="table-light small text-uppercase text-muted">
+                    <tr>
+                        <th style="width: 70px;" class="ps-4 py-3">ID</th>
+                        <th style="width: 100px;" class="py-3">Logo</th>
+                        <th class="py-3">Brand Name</th>
+                        <th class="py-3 text-center" style="width: 130px;">Status</th>
+                        <th class="pe-4 py-3 text-end" style="width: 160px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 py-3 font-monospace text-muted small">
+                                    #@item.BrandId
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="brand-logo-preview rounded-2 bg-white border p-1 d-inline-flex align-items-center justify-content-center"
+                                             style="width: 64px; height: 38px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                                            @if (!string.IsNullOrEmpty(item.DisplayLogo))
+                                            {
+                                                <img src="@item.DisplayLogo"
+                                                     alt="@item.BrandName"
+                                                     class="img-fluid"
+                                                     style="max-height: 28px; max-width: 56px; object-fit: contain;"
+                                                     onerror="this.onerror=null; this.src='/images/buybee-icon.svg';" />
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-patch-check text-muted fs-5"></i>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="fw-semibold text-dark">@item.BrandName</div>
+                                    @if (!string.IsNullOrEmpty(item.BrandLogo))
+                                    {
+                                        <span class="text-muted small font-monospace d-inline-block text-truncate" style="max-width: 260px; font-size: 0.72rem;">
+                                            @item.BrandLogo
+                                        </span>
+                                    }
+                                </td>
+                                <td class="py-3 text-center">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="bb-badge bb-badge-emerald px-2 py-0">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="bb-badge bb-badge-rose px-2 py-0">Inactive</span>
+                                    }
+                                </td>
+                                <td class="pe-4 py-3 text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <a asp-action="Edit" asp-route-id="@item.BrandId" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Edit Brand">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.BrandId" class="btn btn-outline-secondary btn-sm p-1 px-2" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.BrandId" class="btn btn-outline-danger btn-sm p-1 px-2" title="Delete Brand">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted small">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-muted"></i>
+                                No brands registered.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

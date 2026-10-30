@@ -1,0 +1,79 @@
+@* Buybee Bottom-Right Floating AI Shopping Assistant *@
+
+<div class="bb-ai-launcher" id="bbAiLauncher">
+    <div class="bb-ai-tooltip">Ask Buybee AI</div>
+    <button type="button" class="bb-ai-launcher-btn p-0 overflow-hidden" id="bbAiLauncherBtn" aria-label="Open AI Shopping Assistant">
+        <div class="bb-pulse-ring"></div>
+        <img src="~/images/buybee-mascot-icon.png" asp-append-version="true" alt="Buybee AI" width="56" height="56" style="object-fit: cover; border-radius: 50%;" />
+        <span class="bb-ai-launcher-badge">AI</span>
+    </button>
+</div>
+
+<div class="bb-ai-window" id="bbAiFloatingWindow" role="dialog" aria-label="Buybee AI Shopping Assistant">
+    <!-- Header -->
+    <div class="bb-ai-header">
+        <div class="bb-ai-title-wrap">
+            <div class="bb-ai-avatar p-0 overflow-hidden border border-warning" style="background: transparent;">
+                <img src="~/images/buybee-mascot-icon.png" asp-append-version="true" alt="BeeBot" width="38" height="38" style="object-fit: cover;" />
+            </div>
+            <div>
+                <h6 class="bb-ai-name">BeeBot AI <span class="badge bg-warning text-dark px-1.5 py-0.5 rounded-pill" style="font-size: 9px;">BETA</span></h6>
+                <div class="bb-ai-status">
+                    <span class="bb-ai-dot"></span>
+                    <span>MCP &amp; Groq Active</span>
+                </div>
+            </div>
+        </div>
+        <div class="bb-ai-actions">
+            <button type="button" class="bb-ai-action-btn" id="bbAiClearBtn" title="Clear Conversation">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+            <a href="/ai" class="bb-ai-action-btn" title="Open Fullscreen Experience">
+                <i class="bi bi-arrows-fullscreen"></i>
+            </a>
+            <button type="button" class="bb-ai-action-btn" id="bbAiCloseBtn" title="Close Assistant">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Message Stream -->
+    <div class="bb-ai-messages">
+        <div class="bb-ai-msg assistant">
+            <div class="bb-ai-msg-avatar"><i class="bi bi-stars"></i></div>
+            <div class="bb-ai-bubble">
+                <p class="mb-1"><strong>Hi! I'm BeeBot, your Buybee AI Personal Shopper. 🛍️</strong></p>
+                <p class="mb-0 text-secondary">
+                    I can search live products from our store, check stock availability, suggest recommendations, and find top deals. How can I help you today?
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Suggestions -->
+    <div class="bb-ai-suggestions">
+        <button type="button" class="bb-ai-pill" data-prompt="Show me popular smartphones under ₹50,000">
+            <i class="bi bi-phone"></i> Phones under ₹50k
+        </button>
+        <button type="button" class="bb-ai-pill" data-prompt="Find wireless noise cancelling headphones">
+            <i class="bi bi-headphones"></i> Headphones
+        </button>
+        <button type="button" class="bb-ai-pill" data-prompt="Check stock status for Apple AirPods Pro">
+            <i class="bi bi-box-seam"></i> AirPods Stock
+        </button>
+        <button type="button" class="bb-ai-pill" data-prompt="What product categories do you have?">
+            <i class="bi bi-grid"></i> Categories
+        </button>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="bb-ai-input-bar">
+        <button type="button" class="bb-ai-btn-mic" title="Voice Search (Click and speak)">
+            <i class="bi bi-mic-fill"></i>
+        </button>
+        <input type="text" class="bb-ai-input" placeholder="Ask about products, stock, deals..." aria-label="Ask AI Assistant" />
+        <button type="button" class="bb-ai-btn-send" title="Send message">
+            <i class="bi bi-send-fill"></i>
+        </button>
+    </div>
+</div>

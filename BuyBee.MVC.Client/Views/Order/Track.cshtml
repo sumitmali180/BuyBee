@@ -1,0 +1,432 @@
+@model EMart.ViewModels.OrderTrackingVM
+
+@{
+    ViewData["Title"] = "Track Order #" + Model.Order.OrderNumber;
+    int step = Model.CurrentMilestoneStep;
+}
+
+<div class="container py-4 py-md-5">
+    <!-- Breadcrumb & Top Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-area="" asp-controller="Order" asp-action="Index" class="text-decoration-none text-muted">My Orders</a></li>
+                    <li class="breadcrumb-item"><a asp-area="" asp-controller="Order" asp-action="Details" asp-route-id="@Model.Order.OrderId" class="text-decoration-none text-muted">#@Model.Order.OrderNumber</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Live Tracking</li>
+                </ol>
+            </nav>
+            <h1 class="h2 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <span class="spinner-grow spinner-grow-sm text-success" role="status"></span>
+                <span>Live Shipment Tracker</span>
+                <span class="text-secondary font-monospace fs-5">#@Model.Order.OrderNumber</span>
+            </h1>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Details" asp-route-id="@Model.Order.OrderId" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-eye"></i>
+                <span>Order Summary</span>
+            </a>
+            <a asp-action="Invoice" asp-route-id="@Model.Order.OrderId" target="_blank" class="btn btn-light btn-sm border px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-printer"></i>
+                <span>Tax Invoice</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Live Status Banner -->
+    <div class="card border-0 rounded-4 shadow-sm p-4 mb-4" 
+         style="background: linear-gradient(135deg, #181c24 0%, #202736 100%); color: #fff;">
+        <div class="row align-items-center g-4">
+            <div class="col-md-7">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-success px-3 py-1 rounded-pill d-inline-flex align-items-center gap-1">
+                        <span class="spinner-grow spinner-grow-sm" style="width: 8px; height: 8px;"></span> Live Tracking Active
+                    </span>
+                    <span class="text-white-50 small">AWB: <strong class="text-warning font-monospace">@Model.TrackingNumber</strong></span>
+                </div>
+                <h3 class="fw-bold mb-1 text-white">
+                    @if (step == 6)
+                    {
+                        <span>🎉 Package Safely Delivered</span>
+                    }
+                    else if (step == 5)
+                    {
+                        <span>🚚 Out for Delivery • Arriving Soon</span>
+                    }
+                    else if (step >= 3)
+                    {
+                        <span>📦 Package In Transit with @Model.CarrierName</span>
+                    }
+                    else
+                    {
+                        <span>📝 Order Confirmed & Being Prepared</span>
+                    }
+                </h3>
+                <p class="text-white-50 small mb-0">
+                    Carrier: <strong class="text-white">@Model.CarrierName</strong> • Estimated Delivery: <strong class="text-warning">@Model.EstimatedDeliveryDate.ToString("dddd, dd MMM yyyy")</strong>
+                </p>
+            </div>
+
+            <!-- OTP Highlight Card -->
+            <div class="col-md-5 text-md-end">
+                <div class="d-inline-block bg-white bg-opacity-10 border border-warning border-opacity-50 rounded-4 p-3 px-4 text-start shadow-sm">
+                    <div class="small text-uppercase text-warning fw-bold tracking-wider" style="font-size: 10px;">
+                        <i class="bi bi-shield-lock-fill me-1"></i> Secure Delivery Verification OTP
+                    </div>
+                    <div class="display-6 fw-extrabold text-white font-monospace my-1 tracking-widest text-center" style="letter-spacing: 6px;">
+                        @Model.DeliveryOtp
+                    </div>
+                    <div class="text-white-50" style="font-size: 10px;">
+                        Share this 4-digit PIN with delivery executive only after receiving package.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Left: Visual Stepper & Animated Route Map -->
+        <div class="col-lg-8">
+            <!-- 6-Stage Graphical Milestone Progress Stepper -->
+            <div class="card border rounded-4 shadow-sm p-4 bg-white mb-4">
+                <h5 class="fw-bold mb-4 text-dark d-flex align-items-center justify-content-between">
+                    <span>Milestone Progression</span>
+                    <span class="badge bg-light text-dark border font-monospace">Stage @step of 6</span>
+                </h5>
+
+                <div class="position-relative my-3 px-2">
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" 
+                             style="width: @((step - 1) * 20)%; transition: width 0.8s ease;" 
+                             aria-valuenow="@((step - 1) * 20)" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between position-relative" style="margin-top: -20px;">
+                        <!-- Step 1: Placed -->
+                        <div class="text-center" style="width: 70px;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1 border shadow-sm @(step >= 1 ? "bg-warning text-dark border-warning" : "bg-light text-muted")" style="width: 36px; height: 36px;">
+                                <i class="bi bi-receipt fs-6"></i>
+                            </div>
+                            <div class="small fw-bold @(step >= 1 ? "text-dark" : "text-muted")" style="font-size: 11px;">Placed</div>
+                            <div class="text-muted" style="font-size: 9px;">@Model.Order.OrderDate.ToString("dd MMM")</div>
+                        </div>
+
+                        <!-- Step 2: Confirmed -->
+                        <div class="text-center" style="width: 70px;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1 border shadow-sm @(step >= 2 ? "bg-warning text-dark border-warning" : "bg-light text-muted")" style="width: 36px; height: 36px;">
+                                <i class="bi bi-shield-check fs-6"></i>
+                            </div>
+                            <div class="small fw-bold @(step >= 2 ? "text-dark" : "text-muted")" style="font-size: 11px;">Confirmed</div>
+                            <div class="text-muted" style="font-size: 9px;">@(step >= 2 ? "Verified" : "--")</div>
+                        </div>
+
+                        <!-- Step 3: Processing -->
+                        <div class="text-center" style="width: 70px;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1 border shadow-sm @(step >= 3 ? "bg-warning text-dark border-warning" : "bg-light text-muted")" style="width: 36px; height: 36px;">
+                                <i class="bi bi-box-seam fs-6"></i>
+                            </div>
+                            <div class="small fw-bold @(step >= 3 ? "text-dark" : "text-muted")" style="font-size: 11px;">Packed</div>
+                            <div class="text-muted" style="font-size: 9px;">@(step >= 3 ? "Inspected" : "--")</div>
+                        </div>
+
+                        <!-- Step 4: Dispatched -->
+                        <div class="text-center" style="width: 70px;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1 border shadow-sm @(step >= 4 ? "bg-warning text-dark border-warning" : "bg-light text-muted")" style="width: 36px; height: 36px;">
+                                <i class="bi bi-truck fs-6"></i>
+                            </div>
+                            <div class="small fw-bold @(step >= 4 ? "text-dark" : "text-muted")" style="font-size: 11px;">In Transit</div>
+                            <div class="text-muted" style="font-size: 9px;">@(step >= 4 ? "Dispatched" : "--")</div>
+                        </div>
+
+                        <!-- Step 5: Out for Delivery -->
+                        <div class="text-center" style="width: 70px;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1 border shadow-sm @(step >= 5 ? "bg-warning text-dark border-warning" : "bg-light text-muted")" style="width: 36px; height: 36px;">
+                                <i class="bi bi-bicycle fs-6"></i>
+                            </div>
+                            <div class="small fw-bold @(step >= 5 ? "text-dark" : "text-muted")" style="font-size: 11px;">Out for Delivery</div>
+                            <div class="text-muted" style="font-size: 9px;">@(step >= 5 ? "On Route" : "--")</div>
+                        </div>
+
+                        <!-- Step 6: Delivered -->
+                        <div class="text-center" style="width: 70px;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-1 border shadow-sm @(step >= 6 ? "bg-success text-white border-success" : "bg-light text-muted")" style="width: 36px; height: 36px;">
+                                <i class="bi bi-house-check fs-6"></i>
+                            </div>
+                            <div class="small fw-bold @(step >= 6 ? "text-success" : "text-muted")" style="font-size: 11px;">Delivered</div>
+                            <div class="text-muted" style="font-size: 9px;">@(step >= 6 ? "Completed" : "Expected")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Simulated Delivery Route Map (SVG Canvas) -->
+            <div class="card border rounded-4 shadow-sm overflow-hidden bg-white mb-4">
+                <div class="p-3 px-4 border-bottom bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-geo-alt-fill text-danger"></i>
+                            <span>Live Route Visualizer</span>
+                        </h5>
+                        <small class="text-muted">Real-time GPS vehicle telematics simulation</small>
+                    </div>
+                    <span class="badge bg-dark text-warning border px-3 py-1">
+                        @Model.DistanceRemaining
+                    </span>
+                </div>
+
+                <!-- Animated SVG Route Graphic -->
+                <div class="p-4 bg-light position-relative text-center" style="min-height: 260px;">
+                    <svg viewBox="0 0 800 220" width="100%" height="220" xmlns="http://www.w3.org/2000/svg" style="max-width: 800px;">
+                        <!-- Road Path -->
+                        <path id="routePath" d="M 60 160 C 220 160, 260 60, 420 60 C 580 60, 620 160, 740 160" 
+                              fill="none" stroke="#cbd5e1" stroke-width="12" stroke-linecap="round" />
+                        
+                        <!-- Road Markings -->
+                        <path d="M 60 160 C 220 160, 260 60, 420 60 C 580 60, 620 160, 740 160" 
+                              fill="none" stroke="#f8fafc" stroke-width="2" stroke-dasharray="8,8" stroke-linecap="round" />
+
+                        <!-- Active Route Traveled Line -->
+                        @{
+                            string strokeDash = step switch
+                            {
+                                1 => "0 800",
+                                2 => "120 800",
+                                3 => "280 800",
+                                4 => "450 800",
+                                5 => "620 800",
+                                _ => "800 800"
+                            };
+                        }
+                        <path d="M 60 160 C 220 160, 260 60, 420 60 C 580 60, 620 160, 740 160" 
+                              fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"
+                              stroke-dasharray="@strokeDash" style="transition: stroke-dasharray 1s ease;" />
+
+                        <!-- Node 1: Fulfillment Center -->
+                        <g transform="translate(60, 160)">
+                            <circle r="18" fill="#1e293b" />
+                            <circle r="8" fill="#f59e0b" />
+                            <text y="32" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">FC Warehouse</text>
+                            <text y="44" font-size="9" fill="#64748b" text-anchor="middle">Bhiwandi Hub</text>
+                        </g>
+
+                        <!-- Node 2: Air/Sort Center -->
+                        <g transform="translate(290, 85)">
+                            <circle r="14" fill="@(step >= 3 ? "#1e293b" : "#94a3b8")" />
+                            <circle r="6" fill="@(step >= 3 ? "#f59e0b" : "#cbd5e1")" />
+                            <text y="-20" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">Sort Facility</text>
+                            <text y="-9" font-size="9" fill="#64748b" text-anchor="middle">BKC Express</text>
+                        </g>
+
+                        <!-- Node 3: Local Delivery Hub -->
+                        <g transform="translate(540, 95)">
+                            <circle r="14" fill="@(step >= 4 ? "#1e293b" : "#94a3b8")" />
+                            <circle r="6" fill="@(step >= 4 ? "#f59e0b" : "#cbd5e1")" />
+                            <text y="-20" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">Local Hub</text>
+                            <text y="-9" font-size="9" fill="#64748b" text-anchor="middle">Andheri Station</text>
+                        </g>
+
+                        <!-- Node 4: Customer Destination -->
+                        <g transform="translate(740, 160)">
+                            <circle r="20" fill="@(step >= 6 ? "#16a34a" : "#dc2626")" />
+                            <circle r="8" fill="#ffffff" />
+                            <text y="34" font-size="11" font-weight="bold" fill="#1e293b" text-anchor="middle">Your Doorstep</text>
+                            <text y="46" font-size="9" fill="#64748b" text-anchor="middle">@(Model.Address?.City ?? "Destination")</text>
+                        </g>
+
+                        <!-- Moving Delivery Vehicle Icon -->
+                        @{
+                            int vanX = 60;
+                            int vanY = 160;
+                            if (step == 2) { vanX = 175; vanY = 135; }
+                            else if (step == 3) { vanX = 290; vanY = 85; }
+                            else if (step == 4) { vanX = 460; vanY = 65; }
+                            else if (step == 5) { vanX = 650; vanY = 135; }
+                            else if (step >= 6) { vanX = 740; vanY = 160; }
+                        }
+                        <g transform="translate(@vanX, @vanY)" style="transition: transform 1s ease;">
+                            <!-- Pulsing radar ring -->
+                            <circle r="26" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.6">
+                                <animate attributeName="r" values="18;35;18" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <rect x="-16" y="-16" width="32" height="32" rx="16" fill="#f59e0b" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))" />
+                            <text x="0" y="5" font-family="bootstrap-icons" font-size="16" fill="#1e1b18" text-anchor="middle">&#xF5D4;</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Simulation Controls (Quick Testing / Interactive Demo) -->
+                <div class="p-3 bg-white border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <i class="bi bi-joystick text-warning"></i>
+                        <span>Interactive Demo: Test status progression</span>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary btn-sim" data-status="Confirmed">Confirmed</button>
+                        <button class="btn btn-outline-secondary btn-sim" data-status="Processing">Packed</button>
+                        <button class="btn btn-outline-secondary btn-sim" data-status="Shipped">Dispatched</button>
+                        <button class="btn btn-outline-secondary btn-sim" data-status="Out for Delivery">Out for Delivery</button>
+                        <button class="btn btn-outline-success btn-sim" data-status="Delivered">Delivered</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chronological Milestone Checkpoints Feed -->
+            <div class="card border rounded-4 shadow-sm p-4 bg-white">
+                <h5 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-warning"></i>
+                    <span>Shipment Activity Checkpoints</span>
+                </h5>
+
+                <div class="timeline ps-2">
+                    @foreach (var cp in Model.Checkpoints)
+                    {
+                        <div class="d-flex gap-3 mb-3 position-relative">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm flex-shrink-0 @(cp.IsCurrent ? "bg-warning text-dark ring-2 ring-warning" : (cp.IsCompleted ? "bg-success text-white" : "bg-light text-muted border"))" 
+                                 style="width: 32px; height: 32px; z-index: 1;">
+                                <i class="bi @cp.Icon" style="font-size: 13px;"></i>
+                            </div>
+                            <div class="flex-grow-1 pb-2 border-bottom">
+                                <div class="d-flex justify-content-between align-items-baseline">
+                                    <h6 class="fw-bold mb-0 @(cp.IsCompleted ? "text-dark" : "text-muted")">@cp.Title</h6>
+                                    <small class="text-muted" style="font-size: 11px;">@cp.Timestamp.ToString("hh:mm tt, dd MMM")</small>
+                                </div>
+                                <div class="small text-secondary mb-1">@cp.Location</div>
+                                <div class="small text-muted" style="font-size: 12px;">@cp.Description</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Delivery Partner Details & Order Summary -->
+        <div class="col-lg-4">
+            <!-- Delivery Executive Card -->
+            <div class="card border rounded-4 shadow-sm p-4 bg-white mb-4">
+                <h6 class="text-uppercase fw-bold text-muted small mb-3 border-bottom pb-2">Assigned Delivery Executive</h6>
+                
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle bg-warning bg-opacity-20 p-3 text-warning fs-3 border border-warning d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-dark">@Model.DeliveryAgent.Name</h5>
+                        <div class="text-muted small">Buybee Express Partner</div>
+                        <div class="d-flex align-items-center gap-1 text-warning small mt-1">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <span class="fw-bold text-dark">@Model.DeliveryAgent.Rating</span>
+                            <span class="text-muted">(@Model.DeliveryAgent.TotalDeliveries deliveries)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 mb-3 small">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Vehicle Type:</span>
+                        <span class="fw-semibold text-dark">@Model.DeliveryAgent.VehicleType</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Vehicle Number:</span>
+                        <span class="fw-bold font-monospace text-dark">@Model.DeliveryAgent.VehicleNumber</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Tracking AWB:</span>
+                        <span class="fw-bold font-monospace text-warning">@Model.TrackingNumber</span>
+                    </div>
+                </div>
+
+                <a href="tel:@Model.DeliveryAgent.Phone" class="btn btn-outline-dark w-100 py-2 d-inline-flex align-items-center justify-content-center gap-2 mb-2">
+                    <i class="bi bi-telephone-fill text-success"></i>
+                    <span>Call Delivery Executive</span>
+                </a>
+            </div>
+
+            <!-- Delivery Address Card -->
+            <div class="card border rounded-4 shadow-sm p-4 bg-white mb-4">
+                <h6 class="text-uppercase fw-bold text-muted small mb-3 border-bottom pb-2">Delivery Destination</h6>
+                @if (Model.Address != null)
+                {
+                    <div class="d-flex gap-2 mb-2">
+                        <i class="bi bi-geo-alt-fill text-danger fs-5"></i>
+                        <div>
+                            <div class="fw-bold text-dark">@Model.Address.AddressLine1</div>
+                            <div class="text-secondary small">@Model.Address.City, @Model.Address.State</div>
+                            <div class="text-muted font-monospace small">PIN: @Model.Address.Pincode</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted small">Registered Customer Shipping Address</div>
+                }
+            </div>
+
+            <!-- Ordered Items Preview -->
+            <div class="card border rounded-4 shadow-sm p-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <h6 class="text-uppercase fw-bold text-muted small mb-0">Items in Shipment</h6>
+                    <span class="badge bg-light text-secondary border">@Model.OrderDetails.Count items</span>
+                </div>
+
+                <div class="mb-3">
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-light">
+                            <div class="pe-2">
+                                <div class="fw-semibold small text-dark text-truncate" style="max-width: 180px;">@item.ProductName</div>
+                                <small class="text-muted">Qty: @item.Quantity &times; ₹@item.UnitPrice.ToString("N2")</small>
+                            </div>
+                            <div class="fw-bold small text-dark">₹@item.Total.ToString("N2")</div>
+                        </div>
+                    }
+                </div>
+
+                <div class="border-top pt-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark">Total Paid</span>
+                        <span class="fs-5 fw-bold text-amber">₹@Model.Order.GrandTotal.ToString("N2")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const simButtons = document.querySelectorAll('.btn-sim');
+        simButtons.forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const newStatus = this.getAttribute('data-status');
+                const orderId = @Model.Order.OrderId;
+
+                this.disabled = true;
+                this.innerHTML = `<span class="spinner-border spinner-border-sm"></span>`;
+
+                try {
+                    const resp = await fetch(`/Order/SimulateTracking?id=${orderId}&nextStatus=${encodeURIComponent(newStatus)}`, {
+                        method: 'POST'
+                    });
+                    const res = await resp.json();
+                    if (res.success) {
+                        window.location.reload();
+                    } else {
+                        alert(res.message || 'Unable to update status simulation.');
+                        this.disabled = false;
+                        this.textContent = newStatus;
+                    }
+                } catch (e) {
+                    alert('Error connecting to server.');
+                    this.disabled = false;
+                    this.textContent = newStatus;
+                }
+            });
+        });
+    });
+</script>
+}

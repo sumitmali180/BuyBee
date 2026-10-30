@@ -1,0 +1,82 @@
+@model EMart.ViewModels.LoginVM
+
+@{
+    ViewData["Title"] = "Admin Authentication";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buybee Admin Portal - Sign In</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="bg-dark min-vh-100 d-flex align-items-center justify-content-center p-3" style="background-color: var(--color-charcoal-900) !important;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="bb-card p-4 p-md-5 bg-white border-0 shadow-lg">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <img src="~/images/buybee-logo.svg" alt="Buybee" style="height: 42px; width: auto;" />
+                        </div>
+                        <span class="badge bg-secondary bg-opacity-25 text-dark font-monospace text-uppercase small px-2 py-1 mb-2">
+                            Backoffice Access
+                        </span>
+                        <h1 class="h4 fw-bold text-dark mb-1">Management Portal</h1>
+                        <p class="text-muted small mb-0">Authorized personnel authentication only</p>
+                    </div>
+
+                    <form asp-area="Admin"
+                          asp-controller="Account"
+                          asp-action="Login"
+                          method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control" placeholder="admin@buybee.com" autocomplete="email" />
+                            <label asp-for="Email">Administrative Email</label>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="Password" class="form-control" placeholder="Password" autocomplete="current-password" />
+                            <label asp-for="Password">Security Password</label>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>Authorize & Enter</span>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="text-muted small text-decoration-none d-inline-flex align-items-center gap-1 hover-text-dark">
+                            <i class="bi bi-arrow-left"></i>
+                            <span>Return to Customer Storefront</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

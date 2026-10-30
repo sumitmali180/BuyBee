@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <rect x="20" y="13" width="34" height="34" rx="10" fill="#FF6900"/>
+  <g fill="#ffffff">
+    <path d="M29 23h3.5v14H29zm6 0h3.5v7.5c0 1.5 1 2.5 2.5 2.5s2.5-1 2.5-2.5V23H47v14h-3.5v-7c0-1.2-.8-1.8-1.8-1.8s-1.8.6-1.8 1.8v7H35z"/>
+  </g>
+  <text x="66" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" fill="#1f1f1f" letter-spacing="1">Xiaomi</text>
+</svg>

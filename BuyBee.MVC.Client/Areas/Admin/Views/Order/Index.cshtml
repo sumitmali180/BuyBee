@@ -1,0 +1,130 @@
+@model IEnumerable<EMart.Models.Orders>
+
+@{
+    ViewData["Title"] = "Order Fulfillment";
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-cart-check text-amber"></i>
+                <span>Customer Orders</span>
+            </h1>
+            <p class="text-muted small mb-0">Monitor lifecycle, fulfillment dispatch, and customer payments</p>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+            <div>@TempData["Error"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="bb-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+                <thead class="table-light small text-uppercase text-muted">
+                    <tr>
+                        <th class="ps-4 py-3">Order Number</th>
+                        <th class="py-3">Date & Time</th>
+                        <th class="py-3">Customer Reference</th>
+                        <th class="py-3">Payment</th>
+                        <th class="py-3 text-end">Amount</th>
+                        <th class="py-3">Delivery Partner</th>
+                        <th class="py-3 text-center" style="width: 140px;">Status</th>
+                        <th class="pe-4 py-3 text-end" style="width: 120px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <a asp-action="Details" asp-route-id="@item.OrderId" class="fw-bold text-dark font-monospace text-decoration-none">
+                                        #@item.OrderNumber
+                                    </a>
+                                </td>
+                                <td class="py-3 small text-muted">
+                                    @item.OrderDate.ToString("dd MMM yyyy, hh:mm tt")
+                                </td>
+                                <td class="py-3 small text-muted font-monospace">
+                                    Customer #@item.CustomerId
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-light text-dark border">@item.PaymentMethod</span>
+                                </td>
+                                <td class="py-3 text-end fw-bold text-dark">
+                                    ₹@item.GrandTotal.ToString("N2")
+                                </td>
+                                <td class="py-3 small">
+                                    @if (!string.IsNullOrEmpty(item.DeliveryPartnerName))
+                                    {
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-semibold">
+                                            <i class="bi bi-truck me-1"></i> @item.DeliveryPartnerName
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary bg-opacity-10 text-muted rounded-pill">Unassigned</span>
+                                    }
+                                </td>
+                                <td class="py-3 text-center">
+                                    @if (item.OrderStatus == "Delivered")
+                                    {
+                                        <span class="bb-badge bb-badge-emerald px-2 py-0">Delivered</span>
+                                    }
+                                    else if (item.OrderStatus == "Cancelled")
+                                    {
+                                        <span class="bb-badge bb-badge-rose px-2 py-0">Cancelled</span>
+                                    }
+                                    else if (item.OrderStatus == "Shipped")
+                                    {
+                                        <span class="bb-badge bb-badge-sky px-2 py-0">Shipped</span>
+                                    }
+                                    else if (item.OrderStatus == "Confirmed")
+                                    {
+                                        <span class="bb-badge bb-badge-amber px-2 py-0">Confirmed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="bb-badge bb-badge-zinc px-2 py-0">@item.OrderStatus</span>
+                                    }
+                                </td>
+                                <td class="pe-4 py-3 text-end">
+                                    <a asp-action="Details" asp-route-id="@item.OrderId" class="btn btn-outline-secondary btn-sm p-1 px-3 d-inline-flex align-items-center gap-1" title="Manage Order">
+                                        <i class="bi bi-eye"></i>
+                                        <span>Inspect</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted small">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 text-muted"></i>
+                                No customer orders recorded.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

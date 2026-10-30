@@ -1,0 +1,968 @@
+@model EMart.ViewModels.ProductVM
+
+@{
+    ViewData["Title"] = $"{Model.Product.ProductName} - Buybee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var firstImage = Model.ProductImages?.FirstOrDefault()?.ImagePath ?? (!string.IsNullOrEmpty(Model.Product.ThumbnailImage) ? Model.Product.ThumbnailImage : "/images/no-image.png");
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index">Products</a></li>
+            @if (Model.Product.CategoryId.HasValue)
+            {
+                <li class="breadcrumb-item">
+                    <a asp-controller="Products" asp-action="Category" asp-route-id="@Model.Product.CategoryId">
+                        @Model.Product.CategoryName
+                    </a>
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@Model.Product.ProductName</li>
+        </ol>
+    </nav>
+
+    <!-- Main Product Card -->
+    <div class="card border p-3 p-md-4 mb-5">
+        <div class="row g-4 g-lg-5">
+            <!-- Left: Gallery Showcase -->
+            <div class="col-lg-5">
+                <div class="bg-white border rounded-3 p-3 text-center mb-3 d-flex align-items-center justify-content-center" style="height: 420px;">
+                    <img id="mainProductImage"
+                         src="@firstImage"
+                         class="img-fluid"
+                         style="max-height: 100%; max-width: 100%; object-fit: contain; transition: opacity 0.2s ease;"
+                         alt="@Model.Product.ProductName"
+                         onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                </div>
+
+                @if (Model.ProductImages != null && Model.ProductImages.Any())
+                {
+                    <div class="row row-cols-4 g-2">
+                        @foreach (var img in Model.ProductImages)
+                        {
+                            <div class="col">
+                                <div class="border rounded-2 p-1 bg-white text-center thumb-switch-img cursor-pointer"
+                                     style="height: 76px; cursor: pointer;"
+                                     data-src="@img.ImagePath">
+                                    <img src="@img.ImagePath"
+                                         class="w-100 h-100 object-fit-contain"
+                                         alt="thumbnail"
+                                         onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Right: Product Details & Buying Actions -->
+            <div class="col-lg-7">
+                <div class="d-flex flex-column h-100">
+                    <!-- Brand & Stock Indicator -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-uppercase fw-bold text-muted small letter-spacing-1">
+                            @(string.IsNullOrEmpty(Model.Product.BrandName) ? "Buybee Verified" : Model.Product.BrandName)
+                        </span>
+
+                        @if (Model.Product.Quantity > 5)
+                        {
+                            <span class="badge bg-success">In Stock (@Model.Product.Quantity available)</span>
+                        }
+                        else if (Model.Product.Quantity > 0)
+                        {
+                            <span class="badge bg-warning text-dark">Only @Model.Product.Quantity Left</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Out of Stock</span>
+                        }
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="h3 fw-bold text-dark mb-2">
+                        @Model.Product.ProductName
+                    </h1>
+
+                    <!-- Ratings & SKU -->
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-2 border-bottom">
+                        @if (Model.RatingSummary.TotalReviews > 0)
+                        {
+                            <a href="#customer-reviews" class="text-decoration-none d-flex align-items-center gap-1">
+                                <div class="text-warning small d-flex align-items-center">
+                                    @for (int s = 1; s <= 5; s++)
+                                    {
+                                        if (s <= Math.Floor(Model.RatingSummary.AverageRating))
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
+                                        else if (s - Model.RatingSummary.AverageRating < 0.8)
+                                        {
+                                            <i class="bi bi-star-half"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-star"></i>
+                                        }
+                                    }
+                                    <span class="text-dark fw-bold ms-1">@Model.RatingSummary.AverageRating.ToString("0.0")</span>
+                                    <span class="text-muted ms-1">(@Model.RatingSummary.TotalReviews @(Model.RatingSummary.TotalReviews == 1 ? "review" : "reviews"))</span>
+                                </div>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="#customer-reviews" class="text-decoration-none small text-warning d-flex align-items-center gap-1">
+                                <i class="bi bi-star text-muted"></i>
+                                <span class="text-muted">No reviews yet •</span>
+                                <span class="fw-semibold text-dark text-decoration-underline">Be the first to review</span>
+                            </a>
+                        }
+                        <span class="text-muted">•</span>
+                        <span class="small text-muted">SKU: <code class="text-dark">@Model.Product.SKU</code></span>
+                    </div>
+
+                    <!-- Pricing Banner -->
+                    <div class="p-3 bg-light rounded-3 mb-4 d-flex align-items-baseline gap-3">
+                        <span class="display-6 fw-bold text-dark">
+                            ₹@(Model.Product.Price?.ToString("N2") ?? "0.00")
+                        </span>
+                        <span class="badge bg-primary text-dark">Inclusive of all taxes</span>
+                    </div>
+
+                    <!-- Quantity & Action Buttons -->
+                    @if (Model.Product.Quantity > 0)
+                    {
+                        <div class="row align-items-end g-3 mb-4">
+                            <div class="col-sm-4">
+                                <label class="form-label small fw-bold text-muted mb-1 d-block">Select Quantity</label>
+                                <div class="qty-group" style="width: 130px;">
+                                    <button class="btn qty-btn-minus" type="button" aria-label="Decrease quantity">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+                                    <input type="number"
+                                           id="qtySelect"
+                                           class="qty-input"
+                                           value="1"
+                                           min="1"
+                                           max="@Model.Product.Quantity"
+                                           readonly />
+                                    <button class="btn qty-btn-plus" type="button" aria-label="Increase quantity">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-8 d-flex gap-2 align-items-center">
+                                <form asp-controller="Cart"
+                                      asp-action="AddToCart"
+                                      method="post"
+                                      class="add-to-cart-form flex-grow-1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@Model.Product.ProductId" />
+                                    <input type="hidden" name="quantity" id="cartQtyHidden" value="1" />
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
+                                        <i class="bi bi-bag-plus-fill me-1"></i> Add to Bag
+                                    </button>
+                                </form>
+
+                                <form asp-controller="Cart"
+                                      asp-action="AddToCart"
+                                      method="post"
+                                      class="flex-grow-1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@Model.Product.ProductId" />
+                                    <input type="hidden" name="quantity" id="buyNowQtyHidden" value="1" />
+                                    <button type="submit" class="btn btn-dark btn-lg w-100 fw-bold">
+                                        <i class="bi bi-lightning-fill text-warning me-1"></i> Buy Now
+                                    </button>
+                                </form>
+
+                                <button type="button"
+                                        id="btnDetailWishlist"
+                                        class="btn btn-outline-danger btn-lg px-3 bb-detail-wishlist @(Model.IsWishlisted ? "active bg-danger text-white" : "")"
+                                        data-product-id="@Model.Product.ProductId"
+                                        aria-label="Save to Wishlist"
+                                        title="@(Model.IsWishlisted ? "Remove from Wishlist" : "Save to Wishlist")">
+                                    <i class="bi @(Model.IsWishlisted ? "bi-heart-fill" : "bi-heart")"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pincode Delivery Estimator Widget -->
+                        <div class="card bg-light border-0 rounded-3 p-3 my-3 shadow-none">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <label for="deliveryPincodeInput" class="form-label fw-bold text-dark small mb-0 d-flex align-items-center gap-1">
+                                    <i class="bi bi-geo-alt-fill text-warning"></i> Delivery Options & Estimated Date
+                                </label>
+                                <span id="pincodeTierBadge" class="badge bg-warning text-dark d-none" style="font-size: 10px;">Express Hub</span>
+                            </div>
+                            <div class="input-group input-group-sm mb-2" style="max-width: 360px;">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-pin-map"></i></span>
+                                <input type="text"
+                                       id="deliveryPincodeInput"
+                                       class="form-control border-start-0 border-end-0 bg-white"
+                                       placeholder="Enter 6-digit PIN code (e.g. 400001)"
+                                       maxlength="6"
+                                       inputmode="numeric" />
+                                <button class="btn btn-dark fw-semibold px-3" type="button" id="btnCheckPincode">
+                                    Check
+                                </button>
+                            </div>
+                            <div id="pincodeResultArea" class="small mt-1" style="display: none;">
+                                <!-- Filled dynamically via JS -->
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger mb-4">
+                            <i class="bi bi-exclamation-octagon me-2"></i> This product is currently unavailable.
+                        </div>
+                    }
+
+                    <!-- Shipping & Trust Perks -->
+                    <div class="row g-2 border-top pt-3 mt-auto">
+                        <div class="col-sm-4">
+                            <div class="d-flex align-items-center gap-2 small text-muted">
+                                <i class="bi bi-truck text-warning fs-5"></i>
+                                <span>Free shipping over ₹999</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="d-flex align-items-center gap-2 small text-muted">
+                                <i class="bi bi-shield-check text-warning fs-5"></i>
+                                <span>Genuine Brand Warranty</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="d-flex align-items-center gap-2 small text-muted">
+                                <i class="bi bi-arrow-repeat text-warning fs-5"></i>
+                                <span>7-Day Return Policy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Description & Specifications -->
+    <div class="row g-4">
+        <!-- Description -->
+        <div class="col-lg-7">
+            <div class="card border p-4 h-100">
+                <h4 class="fw-bold mb-3 pb-2 border-bottom">About This Product</h4>
+                <div class="text-secondary lh-lg">
+                    @if (!string.IsNullOrEmpty(Model.Product.Description))
+                    {
+                        @Html.Raw(Model.Product.Description)
+                    }
+                    else
+                    {
+                        <p class="text-muted">No extended description provided for this product.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Specifications Table -->
+        <div class="col-lg-5">
+            <div class="card border p-4 h-100">
+                <h4 class="fw-bold mb-3 pb-2 border-bottom">Technical Specifications</h4>
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted fw-semibold" style="width: 40%;">Category</td>
+                            <td class="fw-bold text-dark">@Model.Product.CategoryName</td>
+                        </tr>
+                        @if (!string.IsNullOrEmpty(Model.Product.SubCategoryName))
+                        {
+                            <tr>
+                                <td class="text-muted fw-semibold">Subcategory</td>
+                                <td class="fw-bold text-dark">@Model.Product.SubCategoryName</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td class="text-muted fw-semibold">Brand</td>
+                            <td class="fw-bold text-dark">@Model.Product.BrandName</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">SKU Identifier</td>
+                            <td class="fw-bold text-dark">@Model.Product.SKU</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Unit Type</td>
+                            <td class="fw-bold text-dark">Piece / Unit</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Stock Status</td>
+                            <td class="fw-bold @(Model.Product.Quantity > 0 ? "text-success" : "text-danger")">
+                                @(Model.Product.Quantity > 0 ? $"{Model.Product.Quantity} in stock" : "Sold out")
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Ratings & Reviews Section -->
+    <section id="customer-reviews" class="mt-5 pt-4 border-top">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill fw-bold text-uppercase mb-1" style="font-size: 11px;">
+                    Ratings & Feedback
+                </span>
+                <h3 class="h4 fw-bold text-dark mb-0">Customer Reviews (@Model.RatingSummary.TotalReviews)</h3>
+            </div>
+            <button class="btn btn-warning text-dark fw-bold btn-sm px-3 shadow-sm d-inline-flex align-items-center gap-2" 
+                    type="button" data-bs-toggle="collapse" data-bs-target="#writeReviewCollapse" aria-expanded="false" aria-controls="writeReviewCollapse">
+                <i class="bi bi-pencil-square"></i>
+                <span>Write a Review</span>
+            </button>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Write Review Collapsible Box -->
+        <div class="collapse mb-4" id="writeReviewCollapse">
+            <div class="card border shadow-sm rounded-4 p-4 bg-light">
+                <h5 class="fw-bold text-dark mb-1">Share Your Experience</h5>
+                <p class="text-muted small mb-3">Help other shoppers choose wisely by rating and reviewing this item.</p>
+
+                <form asp-controller="Review" asp-action="Add" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ProductId" value="@Model.Product.ProductId" />
+                    <input type="hidden" name="Rating" id="selectedStarRating" value="5" />
+
+                    <!-- Star Rating Interactive Selector -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark mb-1">Your Overall Rating <span class="text-danger">*</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="star-rating-picker fs-3 text-warning cursor-pointer" style="cursor: pointer;">
+                                <i class="bi bi-star-fill star-pick-icon" data-rating="1"></i>
+                                <i class="bi bi-star-fill star-pick-icon" data-rating="2"></i>
+                                <i class="bi bi-star-fill star-pick-icon" data-rating="3"></i>
+                                <i class="bi bi-star-fill star-pick-icon" data-rating="4"></i>
+                                <i class="bi bi-star-fill star-pick-icon" data-rating="5"></i>
+                            </div>
+                            <span class="fw-bold text-dark fs-6 ms-2" id="starRatingLabel">5.0 - Excellent</span>
+                        </div>
+                    </div>
+
+                    <!-- Review Title -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Review Headline / Title <span class="text-danger">*</span></label>
+                        <input type="text" name="Title" class="form-control" placeholder="e.g., Fantastic quality and fast delivery!" required maxlength="150" />
+                    </div>
+
+                    <!-- Review Comment -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Detailed Feedback <span class="text-danger">*</span></label>
+                        <textarea name="Comment" rows="3" class="form-control" placeholder="What did you like or dislike? How is the fit/performance?" required minlength="10" maxlength="2000"></textarea>
+                    </div>
+
+                    <!-- Photo Upload -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark d-flex justify-content-between">
+                            <span><i class="bi bi-camera-fill me-1 text-muted"></i> Add Photos (Optional)</span>
+                            <span class="text-muted fw-normal" style="font-size: 11px;">Max 3 images (JPG, PNG, WEBP)</span>
+                        </label>
+                        <input type="file" name="Photos" id="reviewPhotoInput" multiple accept="image/*" class="form-control form-control-sm" />
+                        <div id="reviewPhotoPreview" class="d-flex gap-2 mt-2"></div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#writeReviewCollapse">Cancel</button>
+                        <button type="submit" class="btn btn-warning btn-sm fw-bold text-dark px-4 shadow-sm">Submit Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Rating Breakdown & Reviews Feed -->
+        <div class="row g-4">
+            <!-- Left: Breakdown Overview Card -->
+            <div class="col-lg-4">
+                <div class="card border rounded-4 p-4 bg-white shadow-sm h-100">
+                    <h5 class="fw-bold text-dark mb-3">Customer Ratings</h5>
+                    <div class="d-flex align-items-baseline gap-3 mb-2">
+                        <span class="display-4 fw-extrabold text-dark">@Model.RatingSummary.AverageRating.ToString("0.0")</span>
+                        <div>
+                            <div class="text-warning fs-5">
+                                @for (int s = 1; s <= 5; s++)
+                                {
+                                    if (s <= Math.Floor(Model.RatingSummary.AverageRating))
+                                    {
+                                        <i class="bi bi-star-fill"></i>
+                                    }
+                                    else if (s - Model.RatingSummary.AverageRating < 0.8)
+                                    {
+                                        <i class="bi bi-star-half"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star"></i>
+                                    }
+                                }
+                            </div>
+                            <small class="text-muted">Based on @Model.RatingSummary.TotalReviews verified ratings</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <!-- Rating Bars -->
+                    <div class="d-flex flex-column gap-2">
+                        <!-- 5 Star -->
+                        <div class="d-flex align-items-center gap-2 small">
+                            <span class="text-nowrap" style="width: 50px;">5 Star</span>
+                            <div class="progress flex-grow-1" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.RatingSummary.FiveStarPct%;"></div>
+                            </div>
+                            <span class="text-muted text-end" style="width: 35px;">@Model.RatingSummary.FiveStarCount</span>
+                        </div>
+                        <!-- 4 Star -->
+                        <div class="d-flex align-items-center gap-2 small">
+                            <span class="text-nowrap" style="width: 50px;">4 Star</span>
+                            <div class="progress flex-grow-1" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.RatingSummary.FourStarPct%;"></div>
+                            </div>
+                            <span class="text-muted text-end" style="width: 35px;">@Model.RatingSummary.FourStarCount</span>
+                        </div>
+                        <!-- 3 Star -->
+                        <div class="d-flex align-items-center gap-2 small">
+                            <span class="text-nowrap" style="width: 50px;">3 Star</span>
+                            <div class="progress flex-grow-1" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.RatingSummary.ThreeStarPct%;"></div>
+                            </div>
+                            <span class="text-muted text-end" style="width: 35px;">@Model.RatingSummary.ThreeStarCount</span>
+                        </div>
+                        <!-- 2 Star -->
+                        <div class="d-flex align-items-center gap-2 small">
+                            <span class="text-nowrap" style="width: 50px;">2 Star</span>
+                            <div class="progress flex-grow-1" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.RatingSummary.TwoStarPct%;"></div>
+                            </div>
+                            <span class="text-muted text-end" style="width: 35px;">@Model.RatingSummary.TwoStarCount</span>
+                        </div>
+                        <!-- 1 Star -->
+                        <div class="d-flex align-items-center gap-2 small">
+                            <span class="text-nowrap" style="width: 50px;">1 Star</span>
+                            <div class="progress flex-grow-1" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.RatingSummary.OneStarPct%;"></div>
+                            </div>
+                            <span class="text-muted text-end" style="width: 35px;">@Model.RatingSummary.OneStarCount</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-muted small">
+                        <i class="bi bi-shield-check text-success me-1"></i>
+                        100% verified customer evaluations and genuine feedback.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Reviews Feed -->
+            <div class="col-lg-8">
+                @if (Model.Reviews != null && Model.Reviews.Any())
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var review in Model.Reviews)
+                        {
+                            <div class="card border rounded-4 p-4 bg-white shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="fw-bold text-dark">@review.CustomerName</span>
+                                            @if (review.IsVerifiedPurchase)
+                                            {
+                                                <span class="badge bg-success bg-opacity-10 text-success border border-success" style="font-size: 10px;">
+                                                    <i class="bi bi-patch-check-fill me-1"></i>Verified Buyer
+                                                </span>
+                                            }
+                                        </div>
+                                        <div class="text-warning small">
+                                            @for (int s = 1; s <= 5; s++)
+                                            {
+                                                if (s <= review.Rating)
+                                                {
+                                                    <i class="bi bi-star-fill"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star"></i>
+                                                }
+                                            }
+                                            <span class="text-muted ms-2" style="font-size: 11px;">@review.CreatedAt.ToString("dd MMM yyyy")</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h6 class="fw-bold text-dark mt-1 mb-2">@review.Title</h6>
+                                <p class="text-secondary small mb-3">@review.Comment</p>
+
+                                @if (review.Photos != null && review.Photos.Any())
+                                {
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        @foreach (var photo in review.Photos)
+                                        {
+                                            <a href="@photo" target="_blank" class="border rounded-2 overflow-hidden" style="width: 70px; height: 70px;">
+                                                <img src="@photo" class="w-100 h-100 object-fit-cover" alt="Review photo" onerror="this.src='/images/no-image.png'" />
+                                            </a>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="card border rounded-4 p-5 text-center bg-white shadow-sm">
+                        <i class="bi bi-chat-heart text-warning fs-1 mb-2"></i>
+                        <h5 class="fw-bold text-dark">No Reviews Yet</h5>
+                        <p class="text-muted small mb-3">Have you purchased this product? Be the first to share your thoughts with other shoppers!</p>
+                        <div>
+                            <button class="btn btn-outline-warning text-dark btn-sm px-4 fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#writeReviewCollapse">
+                                Write First Review
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Products / Recommended For You -->
+    @if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
+    {
+        <section class="mt-5 pt-4 border-top">
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+                <div>
+                    <span class="badge bg-warning text-dark px-2.5 py-1 rounded-pill fw-bold text-uppercase mb-1" style="font-size: 11px;">
+                        Recommended For You
+                    </span>
+                    <h3 class="h4 fw-bold text-dark mb-0">Related Products</h3>
+                </div>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    View Full Catalog <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+                @foreach (var related in Model.RelatedProducts)
+                {
+                    <div class="col">
+                        <div class="bb-product-card h-100 d-flex flex-column justify-content-between">
+                            <div class="bb-product-thumb-wrap position-relative">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@related.ProductId" class="d-contents">
+                                    <img src="@(string.IsNullOrEmpty(related.ThumbnailImage) ? "/images/no-image.png" : related.ThumbnailImage)"
+                                         class="bb-product-thumb"
+                                         loading="lazy"
+                                         alt="@related.ProductName"
+                                         onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                                </a>
+                                @if (related.Quantity <= 0)
+                                {
+                                    <div class="bb-product-badge-group">
+                                        <span class="badge bg-danger">Sold Out</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="bb-product-body d-flex flex-column flex-grow-1 p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="bb-product-category text-uppercase small text-muted">@related.BrandName</span>
+                                    <span class="badge bg-light text-secondary border">@related.CategoryName</span>
+                                </div>
+
+                                <h4 class="bb-product-title mb-2">
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@related.ProductId" title="@related.ProductName">
+                                        @related.ProductName
+                                    </a>
+                                </h4>
+
+                                <div class="mt-auto pt-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="bb-product-price fs-5 fw-bold text-dark">
+                                            ₹@related.Price?.ToString("N2")
+                                        </div>
+                                    </div>
+
+                                    @if (related.Quantity > 0)
+                                    {
+                                        <form asp-controller="Cart"
+                                              asp-action="AddToCart"
+                                              method="post"
+                                              class="add-to-cart-form w-100">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@related.ProductId" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-outline-warning text-dark w-100 btn-sm fw-semibold shadow-none">
+                                                <i class="bi bi-bag-plus me-1"></i> Add to Bag
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-light text-muted w-100 btn-sm" disabled>
+                                            Out of Stock
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Recently Viewed Products -->
+    <section id="recentlyViewedSection" class="mt-5 pt-4 border-top d-none">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+            <div>
+                <span class="badge bg-secondary text-light px-2.5 py-1 rounded-pill fw-bold text-uppercase mb-1" style="font-size: 11px;">
+                    Browsing History
+                </span>
+                <h3 class="h4 fw-bold text-dark mb-0">Recently Viewed Products</h3>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearRecentHistory">
+                <i class="bi bi-trash3 me-1"></i> Clear History
+            </button>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4" id="recentlyViewedContainer">
+            <!-- Dynamically populated via JavaScript -->
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Quantity input sync
+            const qtyInput = document.getElementById("qtySelect");
+            const cartQty = document.getElementById("cartQtyHidden");
+            const buyNowQty = document.getElementById("buyNowQtyHidden");
+
+            if (qtyInput) {
+                const syncQty = function () {
+                    if (cartQty) cartQty.value = qtyInput.value;
+                    if (buyNowQty) buyNowQty.value = qtyInput.value;
+                };
+                qtyInput.addEventListener("change", syncQty);
+                qtyInput.addEventListener("input", syncQty);
+            }
+
+            // 2. Track Currently Viewed Product in localStorage
+            const currentProduct = {
+                id: @Model.Product.ProductId,
+                name: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Product.ProductName)),
+                price: @(Model.Product.Price ?? 0),
+                thumb: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(firstImage)),
+                brand: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Product.BrandName ?? "")),
+                category: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Product.CategoryName ?? ""))
+            };
+
+            try {
+                let recent = JSON.parse(localStorage.getItem("buybee_recent_products") || "[]");
+                // Remove existing entry for current product if present
+                recent = recent.filter(p => p.id !== currentProduct.id);
+                // Prepend current product
+                recent.unshift(currentProduct);
+                // Keep max 8 items
+                if (recent.length > 8) recent = recent.slice(0, 8);
+                localStorage.setItem("buybee_recent_products", JSON.stringify(recent));
+            } catch (e) {
+                console.warn("Could not save to recently viewed:", e);
+            }
+
+            // 3. Render Recently Viewed (excluding current product)
+            function renderRecentlyViewed() {
+                try {
+                    const recent = JSON.parse(localStorage.getItem("buybee_recent_products") || "[]");
+                    const otherRecent = recent.filter(p => p.id !== currentProduct.id);
+                    const container = document.getElementById("recentlyViewedContainer");
+                    const section = document.getElementById("recentlyViewedSection");
+
+                    if (!container || !section) return;
+
+                    if (otherRecent.length === 0) {
+                        section.classList.add("d-none");
+                        return;
+                    }
+
+                    container.innerHTML = otherRecent.map(p => `
+                        <div class="col">
+                            <div class="bb-product-card h-100 d-flex flex-column justify-content-between">
+                                <div class="bb-product-thumb-wrap position-relative">
+                                    <a href="/Products/Details/${p.id}" class="d-contents">
+                                        <img src="${(p.thumb && p.thumb.trim()) ? p.thumb : '/images/no-image.png'}"
+                                             class="bb-product-thumb"
+                                             loading="lazy"
+                                             alt="${p.name}"
+                                             onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                                    </a>
+                                </div>
+                                <div class="bb-product-body d-flex flex-column flex-grow-1 p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="bb-product-category text-uppercase small text-muted">${p.brand || ''}</span>
+                                        ${p.category ? `<span class="badge bg-light text-secondary border">${p.category}</span>` : ''}
+                                    </div>
+                                    <h4 class="bb-product-title mb-2">
+                                        <a href="/Products/Details/${p.id}" title="${p.name}">
+                                            ${p.name}
+                                        </a>
+                                    </h4>
+                                    <div class="mt-auto pt-2">
+                                        <div class="bb-product-price fs-5 fw-bold text-dark mb-2">
+                                            ₹${Number(p.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                        </div>
+                                        <a href="/Products/Details/${p.id}" class="btn btn-outline-warning text-dark w-100 btn-sm fw-semibold">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join("");
+
+                    section.classList.remove("d-none");
+                } catch (e) {
+                    console.error("Error rendering recently viewed:", e);
+                }
+            }
+
+            renderRecentlyViewed();
+
+            // Clear Recently Viewed History
+            const btnClear = document.getElementById("btnClearRecentHistory");
+            if (btnClear) {
+                btnClear.addEventListener("click", function () {
+                    localStorage.removeItem("buybee_recent_products");
+                    const section = document.getElementById("recentlyViewedSection");
+                    if (section) section.classList.add("d-none");
+                    if (window.showToast) window.showToast("Browsing history cleared.", true);
+                });
+            }
+
+            // 4. Pincode Delivery Estimator
+            const pinInput = document.getElementById("deliveryPincodeInput");
+            const btnCheck = document.getElementById("btnCheckPincode");
+            const resArea = document.getElementById("pincodeResultArea");
+            const tierBadge = document.getElementById("pincodeTierBadge");
+
+            function checkPincode(pin) {
+                if (!pin || pin.trim().length !== 6) {
+                    resArea.style.display = "block";
+                    resArea.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i> Please enter a valid 6-digit PIN code.</span>`;
+                    if (tierBadge) tierBadge.classList.add("d-none");
+                    return;
+                }
+
+                btnCheck.disabled = true;
+                btnCheck.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`;
+
+                fetch(`/Products/CheckDelivery?pincode=${encodeURIComponent(pin.trim())}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        resArea.style.display = "block";
+                        if (data.isValid) {
+                            localStorage.setItem("buybee_delivery_pincode", data.pincode);
+                            if (tierBadge) {
+                                tierBadge.textContent = data.isExpressAvailable ? "⚡ 24h Express Delivery" : "Standard Delivery";
+                                tierBadge.className = data.isExpressAvailable ? "badge bg-warning text-dark" : "badge bg-secondary text-light";
+                                tierBadge.classList.remove("d-none");
+                            }
+
+                            resArea.innerHTML = `
+                                <div class="mt-2 p-2.5 rounded-2 bg-white border">
+                                    <div class="d-flex align-items-center gap-2 text-dark fw-bold mb-1">
+                                        <i class="bi bi-truck text-warning fs-5"></i>
+                                        <span>Delivering to ${data.city}, ${data.pincode}</span>
+                                    </div>
+                                    <div class="text-muted small ps-4">
+                                        <div class="mb-1"><strong class="text-success"><i class="bi bi-calendar-check me-1"></i>${data.estimatedDelivery}</strong></div>
+                                        <div><i class="bi bi-cash-stack me-1 text-primary"></i> ${data.isCodAvailable ? "Cash on Delivery Available" : "Online Payment Only"}</div>
+                                        <div class="text-secondary"><i class="bi bi-shield-check me-1 text-success"></i> 7 Days Replacement Guarantee</div>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            if (tierBadge) tierBadge.classList.add("d-none");
+                            resArea.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle me-1"></i> ${data.message || 'Delivery not available for this pincode.'}</span>`;
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Pincode check error:", err);
+                        resArea.style.display = "block";
+                        resArea.innerHTML = `<span class="text-danger">Unable to verify pincode. Please try again.</span>`;
+                    })
+                    .finally(() => {
+                        btnCheck.disabled = false;
+                        btnCheck.textContent = "Check";
+                    });
+            }
+
+            if (btnCheck && pinInput) {
+                btnCheck.addEventListener("click", () => checkPincode(pinInput.value));
+                pinInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        checkPincode(pinInput.value);
+                    }
+                });
+
+                // Auto-load saved pincode
+                const savedPin = localStorage.getItem("buybee_delivery_pincode");
+                if (savedPin && savedPin.length === 6) {
+                    pinInput.value = savedPin;
+                    checkPincode(savedPin);
+                }
+            }
+
+            // 5. Product Detail Wishlist Toggle
+            const btnWishlist = document.getElementById("btnDetailWishlist");
+            if (btnWishlist) {
+                btnWishlist.addEventListener("click", function () {
+                    const prodId = this.getAttribute("data-product-id");
+                    const icon = this.querySelector("i");
+
+                    const formData = new FormData();
+                    formData.append("productId", prodId);
+
+                    const tokenInput = document.querySelector("input[name='__RequestVerificationToken']");
+                    if (tokenInput) {
+                        formData.append("__RequestVerificationToken", tokenInput.value);
+                    }
+
+                    fetch("/Wishlist/Toggle", {
+                        method: "POST",
+                        body: formData,
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.requiresAuth) {
+                            if (window.showToast) window.showToast(data.message, false);
+                            setTimeout(() => {
+                                window.location.href = data.redirect || "/Account/Login";
+                            }, 800);
+                            return;
+                        }
+
+                        if (data.success) {
+                            if (data.isWishlisted) {
+                                btnWishlist.classList.add("active", "bg-danger", "text-white");
+                                icon.className = "bi bi-heart-fill";
+                                btnWishlist.title = "Remove from Wishlist";
+                            } else {
+                                btnWishlist.classList.remove("active", "bg-danger", "text-white");
+                                icon.className = "bi bi-heart";
+                                btnWishlist.title = "Save to Wishlist";
+                            }
+
+                            // Update header wishlist badges
+                            const badges = document.querySelectorAll(".bb-wishlist-badge");
+                            badges.forEach(b => {
+                                b.textContent = data.wishlistCount;
+                                if (data.wishlistCount > 0) b.classList.remove("d-none");
+                                else b.classList.add("d-none");
+                            });
+
+                            if (window.showToast) window.showToast(data.message, true);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Wishlist toggle error:", err);
+                    });
+                });
+            }
+
+            // 6. Interactive Star Rating Selector
+            const starIcons = document.querySelectorAll(".star-pick-icon");
+            const ratingInput = document.getElementById("selectedStarRating");
+            const ratingLabel = document.getElementById("starRatingLabel");
+            const labels = {
+                1: "1.0 - Poor",
+                2: "2.0 - Fair",
+                3: "3.0 - Average",
+                4: "4.0 - Very Good",
+                5: "5.0 - Excellent"
+            };
+
+            function updateStarDisplay(rating) {
+                starIcons.forEach(icon => {
+                    const r = parseInt(icon.getAttribute("data-rating"));
+                    if (r <= rating) {
+                        icon.className = "bi bi-star-fill star-pick-icon text-warning";
+                    } else {
+                        icon.className = "bi bi-star star-pick-icon text-muted";
+                    }
+                });
+                if (ratingLabel && labels[rating]) {
+                    ratingLabel.textContent = labels[rating];
+                }
+            }
+
+            starIcons.forEach(icon => {
+                icon.addEventListener("mouseenter", function () {
+                    const r = parseInt(this.getAttribute("data-rating"));
+                    updateStarDisplay(r);
+                });
+                icon.addEventListener("mouseleave", function () {
+                    const current = parseInt(ratingInput ? ratingInput.value : "5") || 5;
+                    updateStarDisplay(current);
+                });
+                icon.addEventListener("click", function () {
+                    const r = parseInt(this.getAttribute("data-rating"));
+                    if (ratingInput) ratingInput.value = r;
+                    updateStarDisplay(r);
+                });
+            });
+
+            // 7. Review Photo Upload Preview
+            const photoInput = document.getElementById("reviewPhotoInput");
+            const previewContainer = document.getElementById("reviewPhotoPreview");
+            if (photoInput && previewContainer) {
+                photoInput.addEventListener("change", function () {
+                    previewContainer.innerHTML = "";
+                    if (this.files) {
+                        Array.from(this.files).slice(0, 3).forEach(file => {
+                            if (file.type.startsWith("image/")) {
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    const img = document.createElement("img");
+                                    img.src = e.target.result;
+                                    img.className = "border rounded-2 object-fit-cover shadow-sm";
+                                    img.style.width = "50px";
+                                    img.style.height = "50px";
+                                    previewContainer.appendChild(img);
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+}
+

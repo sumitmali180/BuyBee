@@ -1,0 +1,45 @@
+@{
+    ViewData["Title"] = "Product Inventory Report";
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Reports</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Inventory Catalog</li>
+                </ol>
+            </nav>
+            <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-bar-graph text-amber"></i>
+                <span>Product Inventory Report</span>
+            </h1>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-area="Admin"
+               asp-controller="Reports"
+               asp-action="ProductsReportPdf"
+               class="btn btn-outline-danger btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-pdf"></i>
+                <span>Export PDF</span>
+            </a>
+            <a asp-area="Admin"
+               asp-controller="Reports"
+               asp-action="Index"
+               class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left"></i>
+                <span>All Reports</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="bb-card p-0 overflow-hidden">
+        <iframe src="@ViewBag.ReportUrl"
+                width="100%"
+                height="850"
+                style="border: none; display: block;">
+        </iframe>
+    </div>
+</div>

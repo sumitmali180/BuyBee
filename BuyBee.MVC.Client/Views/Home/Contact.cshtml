@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Contact & Support - Buybee Commerce";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase mb-2" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+            Get in Touch
+        </span>
+        <h1 class="fw-bold text-dark">We're Here to Help You</h1>
+        <p class="text-secondary">Have questions about an order, shipment, or product details? Reach out anytime.</p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 d-flex align-items-center gap-2 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4 mb-5">
+        <!-- Contact Cards -->
+        <div class="col-lg-4">
+            <div class="d-flex flex-column gap-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-warning bg-opacity-15 p-3 text-warning d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                            <i class="bi bi-telephone-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Call Support</h6>
+                            <p class="text-secondary small mb-0">+91 9876543210</p>
+                            <small class="text-muted">Mon - Sat, 9:00 AM - 8:00 PM</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-warning bg-opacity-15 p-3 text-warning d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                            <i class="bi bi-envelope-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Email Support</h6>
+                            <p class="text-secondary small mb-0">support@buybee.com</p>
+                            <small class="text-muted">Typical response within 2 hours</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-warning bg-opacity-15 p-3 text-warning d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                            <i class="bi bi-geo-alt-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">Headquarters</h6>
+                            <p class="text-secondary small mb-0">Pune, Maharashtra, India</p>
+                            <small class="text-muted">Buybee Commerce Technologies</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <h4 class="fw-bold mb-3 text-dark">Send us a Message</h4>
+                <p class="text-secondary small mb-4">Fill out the form below and our dedicated customer support specialist will connect with you.</p>
+
+                <form asp-controller="Home" asp-action="Contact" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold text-dark">Your Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="John Doe" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold text-dark">Email Address</label>
+                            <input type="email" name="email" class="form-control" placeholder="john@example.com" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-dark">Subject</label>
+                            <input type="text" name="subject" class="form-control" placeholder="Order inquiry, return question, or feedback..." required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-dark">Message</label>
+                            <textarea name="message" rows="5" class="form-control" placeholder="Provide details about your query..." required></textarea>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-warning px-4 py-2.5 fw-bold text-dark shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i>Send Message
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

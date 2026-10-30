@@ -1,0 +1,6 @@
+@EMart.MCP.Server_HostAddress = http://localhost:5259
+
+GET {{EMart.MCP.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <circle cx="100" cy="30" r="24" fill="#0096D6"/>
+  <g fill="#ffffff" transform="rotate(-20 100 30)">
+    <path d="M92 12h4v36h-4zm12 0h4v36h-4z"/>
+    <text x="100" y="39" font-family="'Brush Script MT', italic, cursive, sans-serif" font-size="34" font-weight="bold" font-style="italic" fill="#ffffff" text-anchor="middle">hp</text>
+  </g>
+</svg>

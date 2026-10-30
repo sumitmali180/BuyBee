@@ -1,0 +1,77 @@
+@model EMart.Models.Units
+
+@{
+    ViewData["Title"] = "Unit Details - " + Model.UnitName;
+}
+
+<div class="container-fluid px-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1 small text-muted">
+                            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Units</a></li>
+                            <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Details</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-rulers text-amber"></i>
+                        <span>@Model.UnitName</span>
+                    </h1>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.UnitId" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-pencil"></i>
+                        <span>Edit</span>
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-left"></i>
+                        <span>Back</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bb-card p-4 p-md-5">
+                <h2 class="h6 fw-bold text-uppercase text-muted tracking-wider mb-4 pb-2 border-bottom">
+                    Measurement Unit Specification
+                </h2>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Unit ID</span>
+                        <span class="fw-semibold text-dark font-monospace">#@Model.UnitId</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Unit Name</span>
+                        <span class="fw-bold text-dark">@Model.UnitName</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Short Code / Symbol</span>
+                        <span class="badge bg-light text-dark border font-monospace">@(string.IsNullOrEmpty(Model.UnitShortName) ? "None" : Model.UnitShortName)</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Created Date</span>
+                        <span class="small text-muted">@(Model.CreatedOn?.ToString("dd MMM yyyy, hh:mm tt") ?? "-")</span>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Status</span>
+                        @if (Model.IsActive)
+                        {
+                            <span class="bb-badge bb-badge-emerald">Active</span>
+                        }
+                        else
+                        {
+                            <span class="bb-badge bb-badge-rose">Inactive</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

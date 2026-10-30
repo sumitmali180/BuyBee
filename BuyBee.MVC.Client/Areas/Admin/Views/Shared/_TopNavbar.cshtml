@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary border-opacity-25 px-3 py-2 sticky-top" style="background-color: var(--color-charcoal-900) !important; z-index: 1030;">
+    <div class="container-fluid px-2">
+        <a class="navbar-brand d-flex align-items-center gap-2"
+           asp-area="Admin"
+           asp-controller="Dashboard"
+           asp-action="Index">
+            <img src="~/images/buybee-logo-white.svg" alt="Buybee" style="height: 28px; width: auto;" />
+            <span class="badge bg-secondary bg-opacity-50 text-white font-monospace text-uppercase small px-2 py-1">Admin</span>
+        </a>
+
+        <button class="navbar-toggler border-0"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#adminNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                    <a asp-area=""
+                       asp-controller="Home"
+                       asp-action="Index"
+                       target="_blank"
+                       class="btn btn-outline-light btn-sm px-3 d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        <span>Live Storefront</span>
+                    </a>
+
+                    <div class="d-flex align-items-center gap-2 px-3 py-1 bg-white bg-opacity-10 rounded-pill text-white small">
+                        <i class="bi bi-person-circle text-amber"></i>
+                        <span class="fw-medium">@User.Identity.Name</span>
+                    </div>
+
+                    <form asp-area="Admin"
+                          asp-controller="Account"
+                          asp-action="Logout"
+                          method="post"
+                          class="d-inline ms-1">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sign Out</span>
+                        </button>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</nav>

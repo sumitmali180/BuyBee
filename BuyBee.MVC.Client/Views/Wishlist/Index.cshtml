@@ -1,0 +1,163 @@
+@model List<EMart.Models.Products>
+@{
+    ViewData["Title"] = "My Wishlist - Buybee";
+    var itemCount = Model?.Count ?? 0;
+}
+
+<div class="container py-4">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">My Wishlist</li>
+        </ol>
+    </nav>
+
+    <!-- Page Title Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 mb-4 border-bottom">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                <i class="bi bi-heart-fill text-danger"></i>
+                <span>My Wishlist</span>
+                <span class="badge bg-light text-dark border rounded-pill fs-6 fw-normal px-2.5 py-1">
+                    @itemCount @(itemCount == 1 ? "item" : "items")
+                </span>
+            </h1>
+            <p class="text-muted small mb-0">Items you've saved to purchase later</p>
+        </div>
+
+        @if (itemCount > 0)
+        {
+            <div class="d-flex gap-2">
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Continue Shopping
+                </a>
+            </div>
+        }
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <div>@TempData["Success"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            @foreach (var item in Model)
+            {
+                <div class="col" id="wishlist-item-@item.ProductId">
+                    <div class="bb-product-card h-100 d-flex flex-column justify-content-between position-relative">
+                        <!-- Remove from Wishlist Button -->
+                        <form asp-controller="Wishlist"
+                              asp-action="Remove"
+                              method="post"
+                              class="position-absolute top-0 end-0 m-2 z-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit"
+                                    class="btn btn-light btn-sm rounded-circle shadow-sm border p-1 d-flex align-items-center justify-content-center text-muted hover-danger"
+                                    style="width: 32px; height: 32px;"
+                                    title="Remove from Wishlist">
+                                <i class="bi bi-x-lg" style="font-size: 13px;"></i>
+                            </button>
+                        </form>
+
+                        <!-- Thumbnail -->
+                        <div class="bb-product-thumb-wrap position-relative">
+                            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="d-contents">
+                                <img src="@(string.IsNullOrEmpty(item.ThumbnailImage) ? "/images/no-image.png" : item.ThumbnailImage)"
+                                     class="bb-product-thumb"
+                                     loading="lazy"
+                                     alt="@item.ProductName"
+                                     onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                            </a>
+                            @if (item.Quantity <= 0)
+                            {
+                                <div class="bb-product-badge-group">
+                                    <span class="badge bg-danger">Out of Stock</span>
+                                </div>
+                            }
+                            else if (item.Quantity <= 5)
+                            {
+                                <div class="bb-product-badge-group">
+                                    <span class="badge bg-warning">Only @item.Quantity left</span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Content -->
+                        <div class="bb-product-body d-flex flex-column flex-grow-1 p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="bb-product-category text-uppercase small text-muted">@item.BrandName</span>
+                                @if (!string.IsNullOrEmpty(item.CategoryName))
+                                {
+                                    <span class="badge bg-light text-secondary border">@item.CategoryName</span>
+                                }
+                            </div>
+
+                            <h3 class="bb-product-title mb-2 fs-6 fw-semibold">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" title="@item.ProductName">
+                                    @item.ProductName
+                                </a>
+                            </h3>
+
+                            <div class="mt-auto pt-2">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="bb-product-price fs-5 fw-bold text-dark">
+                                        ₹@item.Price?.ToString("N2")
+                                    </div>
+                                    @if (item.Quantity > 0)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">In Stock</span>
+                                    }
+                                </div>
+
+                                @if (item.Quantity > 0)
+                                {
+                                    <form asp-controller="Wishlist"
+                                          asp-action="MoveToCart"
+                                          method="post"
+                                          class="w-100">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-primary w-100 btn-sm fw-semibold shadow-sm">
+                                            <i class="bi bi-bag-plus me-1"></i> Move to Bag
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-light text-muted w-100 btn-sm" disabled>
+                                        Currently Unavailable
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border p-5 text-center my-4 bg-light shadow-sm rounded-4">
+            <div class="py-4">
+                <div class="d-inline-flex p-3 rounded-circle bg-white text-danger shadow-sm mb-3">
+                    <i class="bi bi-heart" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="h4 fw-bold text-dark mb-2">Your wishlist is empty</h2>
+                <p class="text-muted mb-4 mx-auto" style="max-width: 440px;">
+                    Explore our top categories and tap the heart icon on any product to save it here for later.
+                </p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-warning px-4 py-2 fw-bold text-dark shadow-sm">
+                    <i class="bi bi-search me-1"></i> Explore Products
+                </a>
+            </div>
+        </div>
+    }
+</div>

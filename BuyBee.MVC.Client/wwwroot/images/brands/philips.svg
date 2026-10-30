@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <g fill="#0B5ED7">
+    <circle cx="40" cy="30" r="16" fill="#0B5ED7"/>
+    <circle cx="40" cy="30" r="13" fill="#ffffff"/>
+    <path d="M30 30c5-5 15-5 20 0-5 5-15 5-20 0z" fill="#0B5ED7"/>
+  </g>
+  <text x="118" y="38" font-family="Georgia, serif" font-size="22" font-weight="bold" fill="#0B5ED7" text-anchor="middle" letter-spacing="2">PHILIPS</text>
+</svg>

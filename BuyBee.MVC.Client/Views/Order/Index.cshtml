@@ -1,0 +1,107 @@
+@model IEnumerable<EMart.Models.Orders>
+
+@{
+    ViewData["Title"] = "My Orders - Buybee";
+}
+
+<div class="container py-4 py-md-5">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4 pb-2 border-bottom">
+        <div>
+            <h1 class="h2 fw-bold mb-1 d-flex align-items-center gap-2">
+                <i class="bi bi-box-seam text-warning"></i>
+                Order History
+            </h1>
+            <p class="text-muted small mb-0">Track shipments, view invoices, and review previous purchases</p>
+        </div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Shop More
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="card border overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="px-3">Order Number</th>
+                            <th>Date Placed</th>
+                            <th>Payment</th>
+                            <th>Order Total</th>
+                            <th>Status</th>
+                            <th class="text-end px-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td class="px-3 fw-bold text-dark">
+                                    @order.OrderNumber
+                                </td>
+                                <td class="text-secondary small">
+                                    @order.OrderDate.ToString("dd MMM yyyy, hh:mm tt")
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@order.PaymentMethod</span>
+                                </td>
+                                <td class="fw-bold text-dark">
+                                    ₹@order.GrandTotal.ToString("N2")
+                                </td>
+                                <td>
+                                    @if (order.OrderStatus == "Delivered")
+                                    {
+                                        <span class="badge bg-success">Delivered</span>
+                                    }
+                                    else if (order.OrderStatus == "Cancelled")
+                                    {
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    }
+                                    else if (order.OrderStatus == "Shipped")
+                                    {
+                                        <span class="badge bg-info">Shipped</span>
+                                    }
+                                    else if (order.OrderStatus == "Confirmed")
+                                    {
+                                        <span class="badge bg-primary text-dark">Confirmed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">@order.OrderStatus</span>
+                                    }
+                                </td>
+                                <td class="text-end px-3">
+                                    <div class="d-inline-flex gap-2">
+                                        <a asp-action="Track" asp-route-id="@order.OrderId" class="btn btn-warning btn-sm text-dark fw-bold d-inline-flex align-items-center gap-1 shadow-sm">
+                                            <i class="bi bi-geo-alt-fill"></i> Track
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-eye me-1"></i> Details
+                                        </a>
+                                        <a asp-action="Invoice" asp-route-id="@order.OrderId" target="_blank" class="btn btn-light btn-sm border" title="Print Invoice">
+                                            <i class="bi bi-printer"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border p-5 text-center my-3 bg-white">
+            <i class="bi bi-box-seam text-warning opacity-50 display-3 d-block mb-3"></i>
+            <h2 class="h4 fw-bold mb-2">No Orders Found</h2>
+            <p class="text-muted small mb-4">You have not placed any orders yet. Start shopping to view order status here.</p>
+            <div>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">
+                    <i class="bi bi-bag me-1"></i> Discover Products
+                </a>
+            </div>
+        </div>
+    }
+</div>

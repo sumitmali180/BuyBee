@@ -1,0 +1,187 @@
+@model BuyBee.MVC.Client.ViewModels.VendorOrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Order Details - " + Model.OrderNumber;
+}
+
+<div class="container-fluid px-0" style="max-width: 1050px;">
+    <!-- Breadcrumb & Actions -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-3">
+        <a asp-area="Vendor" asp-controller="Orders" asp-action="Index" class="text-decoration-none text-muted small">
+            <i class="bi bi-arrow-left me-1"></i> Back to Orders
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-area="Vendor" asp-controller="Orders" asp-action="PackingSlip" asp-route-id="@Model.OrderId" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm bg-white">
+                <i class="bi bi-printer me-1"></i> Print Packing Slip
+            </a>
+        </div>
+    </div>
+
+    <!-- Header Card -->
+    <div class="vendor-card p-4 mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h1 class="h4 fw-bold text-dark mb-0">Order @Model.OrderNumber</h1>
+                    <span class="badge bg-indigo text-white rounded-pill px-3 py-1 small" style="background-color: #4f46e5;">
+                        Vendor Fulfillment
+                    </span>
+                </div>
+                <span class="text-muted small">
+                    Placed on @Model.OrderDate.ToString("dddd, dd MMMM yyyy, hh:mm tt") &bull; Payment: <strong>@Model.PaymentMethod</strong>
+                </span>
+            </div>
+            <div class="text-md-end">
+                <span class="small text-muted d-block mb-1">Master Order Status</span>
+                <span class="badge bg-secondary text-white fs-6 px-3 py-1 rounded-pill">
+                    @Model.OrderStatus
+                </span>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.CarrierName) || !string.IsNullOrEmpty(Model.TrackingNumber))
+        {
+            <div class="mt-3 pt-3 border-top d-flex flex-wrap align-items-center gap-3 small text-muted">
+                <span><i class="bi bi-truck text-primary me-1"></i> Carrier: <strong>@(Model.CarrierName ?? "Buybee Express")</strong></span>
+                <span>&bull;</span>
+                <span><i class="bi bi-upc-scan text-secondary me-1"></i> AWB Tracking: <code>@(Model.TrackingNumber ?? "Pending Generation")</code></span>
+            </div>
+        }
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Customer & Destination Card -->
+        <div class="col-12 col-md-6">
+            <div class="vendor-card p-4 h-100">
+                <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+                    <i class="bi bi-geo-alt text-danger"></i>
+                    <span>Delivery Destination</span>
+                </h6>
+                <div class="mb-2">
+                    <strong class="text-dark">@Model.CustomerName</strong>
+                </div>
+                <p class="text-muted small mb-2">
+                    @(Model.AddressLine1 ?? "Standard Shipping Address")<br />
+                    @Model.City, @Model.State - @Model.Pincode
+                </p>
+                <div class="small text-muted bg-light p-2 rounded-2 d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-lock text-secondary"></i>
+                    <span>Contact: <code>@Model.CustomerPhoneMasked</code> (Protected)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendor Settlement Card -->
+        <div class="col-12 col-md-6">
+            <div class="vendor-card p-4 h-100">
+                <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+                    <i class="bi bi-receipt text-success"></i>
+                    <span>Payout Settlement Summary</span>
+                </h6>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Vendor Items Subtotal:</span>
+                    <strong class="text-dark">₹@Model.VendorSubtotal.ToString("N2")</strong>
+                </div>
+                <div class="d-flex justify-content-between py-1 small">
+                    <span class="text-muted">Platform Commission (@Model.CommissionRate%):</span>
+                    <span class="text-danger">-₹@Model.PlatformCommission.ToString("N2")</span>
+                </div>
+                <hr class="my-2" />
+                <div class="d-flex justify-content-between py-1">
+                    <span class="fw-bold text-dark">Estimated Net Payout:</span>
+                    <span class="fw-bold text-success fs-5">₹@Model.NetPayout.ToString("N2")</span>
+                </div>
+                <span class="text-muted d-block mt-2" style="font-size: 0.72rem;">
+                    Settlement will be credited to your registered bank account upon successful order delivery.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line Items Table Card -->
+    <div class="vendor-card p-4 mb-4">
+        <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
+            <span>Your Items in this Order (@Model.Items.Count)</span>
+            <span class="small text-muted fw-normal">Items belonging only to your merchant store</span>
+        </h5>
+
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light text-muted small text-uppercase">
+                    <tr>
+                        <th style="min-width: 240px;">Product</th>
+                        <th>Unit Price</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                        <th>Fulfillment Status</th>
+                        <th class="text-end">Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@(string.IsNullOrEmpty(item.ImagePath) ? "/images/product-placeholder.png" : item.ImagePath)" 
+                                         alt="@item.ProductName" 
+                                         class="rounded-3 object-fit-cover border" 
+                                         style="width: 48px; height: 48px;" 
+                                         onerror="this.src='/images/product-placeholder.png'" />
+                                    <div>
+                                        <span class="fw-bold text-dark d-block">@item.ProductName</span>
+                                        <span class="text-muted small">ID: #@item.ProductId &bull; Line #@item.OrderDetailId</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted small">₹@item.UnitPrice.ToString("N2")</td>
+                            <td><span class="badge bg-light text-dark border">@item.Quantity</span></td>
+                            <td class="fw-bold text-dark">₹@item.Total.ToString("N2")</td>
+                            <td>
+                                @{
+                                    string itemBadge = item.ItemStatus switch
+                                    {
+                                        "Delivered" => "bg-success text-white",
+                                        "Shipped" => "bg-info text-dark",
+                                        "Packed" => "bg-primary text-white",
+                                        "Processing" => "bg-warning text-dark",
+                                        _ => "bg-secondary text-white"
+                                    };
+                                }
+                                <span class="badge @itemBadge rounded-pill px-2 py-1 small">
+                                    @item.ItemStatus
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <form asp-area="Vendor" asp-controller="Orders" asp-action="UpdateItemStatus" method="post" class="d-inline-flex gap-1 justify-content-end align-items-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="orderDetailId" value="@item.OrderDetailId" />
+                                    <input type="hidden" name="orderId" value="@Model.OrderId" />
+                                    
+                                    @if (item.ItemStatus == "Pending" || item.ItemStatus == "Processing")
+                                    {
+                                        <button type="submit" name="newStatus" value="Packed" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm" style="background-color: #4f46e5; border-color: #4f46e5;">
+                                            <i class="bi bi-box-seam me-1"></i> Mark as Packed
+                                        </button>
+                                    }
+                                    else if (item.ItemStatus == "Packed")
+                                    {
+                                        <span class="text-success small fw-semibold">
+                                            <i class="bi bi-check2-circle me-1"></i> Ready for Dispatch
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">
+                                            Handed over to carrier
+                                        </span>
+                                    }
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

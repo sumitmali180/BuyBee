@@ -1,0 +1,260 @@
+@model EMart.ViewModels.AdminDashboardVM
+
+@{
+    ViewData["Title"] = "Operations Dashboard";
+}
+
+<div class="container-fluid px-0">
+    <!-- Welcome Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-speedometer2 text-amber"></i>
+                <span>Operations Dashboard</span>
+            </h1>
+            <p class="text-muted small mb-0">Overview of live store performance, inventory levels, and orders</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Product</span>
+            </a>
+            <a asp-area="Admin" asp-controller="Reports" asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>Reports</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Revenue Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bb-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-muted text-uppercase fw-semibold small tracking-wider">Gross Revenue</span>
+                        <div class="fs-3 fw-extrabold text-dark mt-2 mb-0">₹@Model.TotalRevenue.ToString("N2")</div>
+                        <span class="bb-badge bb-badge-emerald mt-2">Active sales</span>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light border text-amber" style="width: 48px; height: 48px;">
+                        <i class="bi bi-currency-rupee fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bb-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-muted text-uppercase fw-semibold small tracking-wider">Total Orders</span>
+                        <div class="fs-3 fw-extrabold text-dark mt-2 mb-0">@Model.TotalOrders</div>
+                        <span class="bb-badge bb-badge-amber mt-2">@Model.PendingOrders pending review</span>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light border text-dark" style="width: 48px; height: 48px;">
+                        <i class="bi bi-cart-check fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Products Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bb-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-muted text-uppercase fw-semibold small tracking-wider">Live Catalog</span>
+                        <div class="fs-3 fw-extrabold text-dark mt-2 mb-0">@Model.TotalProducts</div>
+                        <span class="bb-badge bb-badge-sky mt-2">Active products</span>
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light border text-dark" style="width: 48px; height: 48px;">
+                        <i class="bi bi-box-seam fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock / Users Card -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="bb-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-muted text-uppercase fw-semibold small tracking-wider">Registered Users</span>
+                        <div class="fs-3 fw-extrabold text-dark mt-2 mb-0">@Model.TotalCustomers</div>
+                        @if (Model.LowStockProductsCount > 0)
+                        {
+                            <span class="bb-badge bb-badge-rose mt-2">@Model.LowStockProductsCount low in stock</span>
+                        }
+                        else
+                        {
+                            <span class="bb-badge bb-badge-emerald mt-2">Inventory healthy</span>
+                        }
+                    </div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light border text-dark" style="width: 48px; height: 48px;">
+                        <i class="bi bi-people fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content: Recent Orders & Alerts -->
+    <div class="row g-4">
+        <!-- Recent Orders Table -->
+        <div class="col-lg-8">
+            <div class="bb-card p-0 overflow-hidden">
+                <div class="p-3 px-4 border-bottom bg-white d-flex align-items-center justify-content-between">
+                    <h2 class="h6 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-amber"></i>
+                        <span>Recent Orders</span>
+                    </h2>
+                    <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        View All Orders
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    @if (Model.RecentOrders.Any())
+                    {
+                        <table class="table align-middle table-hover mb-0">
+                            <thead class="table-light small text-uppercase text-muted">
+                                <tr>
+                                    <th class="ps-4 py-3">Order Number</th>
+                                    <th class="py-3">Date</th>
+                                    <th class="py-3">Payment</th>
+                                    <th class="py-3">Total</th>
+                                    <th class="py-3">Status</th>
+                                    <th class="pe-4 py-3 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <a asp-area="Admin" asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="fw-semibold text-dark text-decoration-none font-monospace">
+                                                #@order.OrderNumber
+                                            </a>
+                                        </td>
+                                        <td class="py-3 small text-muted">
+                                            @order.OrderDate.ToString("dd MMM yyyy")
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="badge bg-light text-dark border small">@order.PaymentMethod</span>
+                                        </td>
+                                        <td class="py-3 fw-bold text-dark">
+                                            ₹@order.GrandTotal.ToString("N2")
+                                        </td>
+                                        <td class="py-3">
+                                            @if (order.OrderStatus == "Delivered")
+                                            {
+                                                <span class="bb-badge bb-badge-emerald px-2 py-0">Delivered</span>
+                                            }
+                                            else if (order.OrderStatus == "Cancelled")
+                                            {
+                                                <span class="bb-badge bb-badge-rose px-2 py-0">Cancelled</span>
+                                            }
+                                            else if (order.OrderStatus == "Shipped")
+                                            {
+                                                <span class="bb-badge bb-badge-sky px-2 py-0">Shipped</span>
+                                            }
+                                            else if (order.OrderStatus == "Confirmed")
+                                            {
+                                                <span class="bb-badge bb-badge-amber px-2 py-0">Confirmed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="bb-badge bb-badge-zinc px-2 py-0">@order.OrderStatus</span>
+                                            }
+                                        </td>
+                                        <td class="pe-4 py-3 text-end">
+                                            <a asp-area="Admin" asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Inspect Order">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted small">
+                            <i class="bi bi-inbox fs-2 d-block mb-2 text-muted"></i>
+                            No orders placed yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Widgets: Low Stock Alerts & Quick Management -->
+        <div class="col-lg-4">
+            <!-- Low Stock Alert Box -->
+            <div class="bb-card p-4 mb-4">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <h2 class="h6 fw-bold mb-0 text-danger d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Low Stock Alert</span>
+                    </h2>
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Limit: 5</span>
+                </div>
+
+                @if (Model.LowStockProducts.Any())
+                {
+                    <div class="d-flex flex-column gap-2">
+                        @foreach (var prod in Model.LowStockProducts)
+                        {
+                            <div class="p-2 px-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                                <div class="text-truncate me-2" style="max-width: 200px;">
+                                    <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@prod.ProductId" class="fw-semibold text-dark text-decoration-none small d-block text-truncate">
+                                        @prod.ProductName
+                                    </a>
+                                    <span class="small text-muted" style="font-size: 0.75rem;">@prod.BrandName</span>
+                                </div>
+                                <span class="badge bg-danger text-white rounded-pill px-2 py-1 small font-monospace">
+                                    @prod.Quantity left
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted small py-3 text-center">
+                        <i class="bi bi-check-circle text-success fs-3 d-block mb-1"></i>
+                        All inventory stock levels are healthy.
+                    </div>
+                }
+            </div>
+
+            <!-- Quick Management Shortcuts -->
+            <div class="bb-card p-4">
+                <h2 class="h6 fw-bold mb-3 pb-2 border-bottom text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-lightning-charge text-amber"></i>
+                    <span>Quick Management</span>
+                </h2>
+                <div class="d-flex flex-column gap-2">
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary text-start btn-sm py-2 px-3 d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-box-seam me-2 text-amber"></i> Inventory and Stock</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                    <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="btn btn-outline-secondary text-start btn-sm py-2 px-3 d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-grid me-2 text-amber"></i> Categories Catalog</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                    <a asp-area="Admin" asp-controller="Brands" asp-action="Index" class="btn btn-outline-secondary text-start btn-sm py-2 px-3 d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-bricks me-2 text-amber"></i> Brand Partners</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-outline-secondary text-start btn-sm py-2 px-3 d-flex align-items-center justify-content-between">
+                        <span><i class="bi bi-people-fill me-2 text-amber"></i> Staff and Permissions</span>
+                        <i class="bi bi-chevron-right small text-muted"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

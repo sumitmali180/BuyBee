@@ -1,0 +1,267 @@
+@model BuyBee.MVC.Client.ViewModels.VendorDashboardViewModel
+
+@{
+    ViewData["Title"] = "Merchant Dashboard";
+}
+
+<div class="container-fluid px-0">
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <h1 class="h3 fw-bold text-dark mb-0">Merchant Overview</h1>
+                <span class="badge bg-success bg-opacity-10 text-success fw-semibold px-2 py-1 rounded-pill small">
+                    <i class="bi bi-shield-check me-1"></i> Active Partner
+                </span>
+            </div>
+            <p class="text-muted small mb-0 mt-1">
+                Real-time performance metrics, inventory alerts, and orders awaiting fulfillment for <strong>@Model.StoreName</strong>.
+            </p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-area="Vendor" asp-controller="Products" asp-action="Create" class="btn btn-vendor shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle"></i>
+                <span>Add Product</span>
+            </a>
+            <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 bg-white">
+                <i class="bi bi-layers"></i>
+                <span>Manage Stock</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Low Stock Alert Banner (conditional) -->
+    @if (Model.LowStockCount > 0 || Model.OutOfStockCount > 0)
+    {
+        <div class="alert alert-warning border-0 rounded-4 shadow-sm p-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-warning bg-opacity-25 text-dark p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                    <i class="bi bi-exclamation-triangle-fill fs-5 text-warning-emphasis"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-warning-emphasis">Immediate Inventory Attention Required</h6>
+                    <span class="small text-muted">
+                        You have <strong>@Model.LowStockCount</strong> low-stock products and <strong>@Model.OutOfStockCount</strong> out-of-stock items that need restocking.
+                    </span>
+                </div>
+            </div>
+            <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" asp-route-stockFilter="LOW" class="btn btn-sm btn-dark rounded-pill px-3">
+                View Critical Stock &rarr;
+            </a>
+        </div>
+    }
+
+    <!-- KPI Metric Cards Grid -->
+    <div class="row g-3 mb-4">
+        <!-- Revenue Card -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="vendor-card p-3 p-md-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-semibold text-uppercase">Net Earnings</span>
+                    <div class="rounded-3 p-2 bg-indigo bg-opacity-10 text-primary" style="background-color: #e0e7ff; color: #4338ca;">
+                        <i class="bi bi-currency-rupee fs-5"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">₹@Model.NetPayout.ToString("N2")</h3>
+                <div class="d-flex align-items-center gap-2 small text-muted">
+                    <span>GMV: ₹@Model.TotalRevenue.ToString("N0")</span>
+                    <span>&bull;</span>
+                    <span class="text-secondary" title="Platform fee deducted">10% comm.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Card -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="vendor-card p-3 p-md-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-semibold text-uppercase">Total Orders</span>
+                    <div class="rounded-3 p-2 bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-bag-check fs-5"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">@Model.TotalOrders</h3>
+                <div class="d-flex align-items-center gap-2 small">
+                    <span class="text-warning fw-semibold">
+                        <i class="bi bi-hourglass-split"></i> @Model.PendingOrders Pending
+                    </span>
+                    <span class="text-muted">&bull;</span>
+                    <span class="text-success fw-semibold">
+                        <i class="bi bi-box2-heart"></i> @Model.PackedOrders Packed
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Catalog Products Card -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="vendor-card p-3 p-md-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-semibold text-uppercase">Active Products</span>
+                    <div class="rounded-3 p-2 bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-box-seam fs-5"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">@Model.ActiveProducts</h3>
+                <div class="small text-muted">
+                    <span>@Model.TotalProducts total products in your store</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Units Sold Card -->
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="vendor-card p-3 p-md-4 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small fw-semibold text-uppercase">Units Sold</span>
+                    <div class="rounded-3 p-2 bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-graph-up fs-5"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">@Model.TotalUnitsSold</h3>
+                <div class="small text-muted">
+                    <span>Lifetime item quantity shipped</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main 2-Column Section: Stock Alerts & Recent Orders -->
+    <div class="row g-4">
+        <!-- Stock Alerts Column -->
+        <div class="col-12 col-xl-5">
+            <div class="vendor-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-circle text-warning fs-5"></i>
+                        <h5 class="fw-bold text-dark mb-0">Stock Alerts</h5>
+                    </div>
+                    <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" class="small fw-semibold text-decoration-none" style="color: #4f46e5;">
+                        View All &rarr;
+                    </a>
+                </div>
+
+                @if (Model.StockAlerts == null || !Model.StockAlerts.Any())
+                {
+                    <div class="text-center py-5 text-muted">
+                        <div class="rounded-circle bg-light p-3 d-inline-flex mb-2">
+                            <i class="bi bi-check2-circle fs-2 text-success"></i>
+                        </div>
+                        <p class="small mb-0">All your products have healthy inventory levels!</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var item in Model.StockAlerts)
+                        {
+                            <div class="list-group-item px-0 py-3 d-flex align-items-center justify-content-between gap-3 border-bottom">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@(string.IsNullOrEmpty(item.ImagePath) ? "/images/product-placeholder.png" : item.ImagePath)" 
+                                         alt="@item.ProductName" 
+                                         class="rounded-3 object-fit-cover border" 
+                                         style="width: 48px; height: 48px;" 
+                                         onerror="this.src='/images/product-placeholder.png'" />
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 200px;" title="@item.ProductName">
+                                            @item.ProductName
+                                        </h6>
+                                        <span class="text-muted small">
+                                            ₹@item.Price.ToString("N0") &bull; @(item.CategoryName ?? "General")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-end flex-shrink-0">
+                                    @if (item.StockQuantity == 0)
+                                    {
+                                        <span class="badge bg-danger text-white rounded-pill px-2 py-1 small d-block mb-1">Out of Stock</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark rounded-pill px-2 py-1 small d-block mb-1">
+                                            @item.StockQuantity left (Thresh: @item.LowStockThreshold)
+                                        </span>
+                                    }
+                                    <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" asp-route-searchTerm="@item.ProductName" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-2" style="font-size: 0.75rem;">
+                                        Restock
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Recent Orders Column -->
+        <div class="col-12 col-xl-7">
+            <div class="vendor-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-primary fs-5"></i>
+                        <h5 class="fw-bold text-dark mb-0">Recent Store Orders</h5>
+                    </div>
+                    <a asp-area="Vendor" asp-controller="Orders" asp-action="Index" class="small fw-semibold text-decoration-none" style="color: #4f46e5;">
+                        Manage Orders &rarr;
+                    </a>
+                </div>
+
+                @if (Model.RecentOrders == null || !Model.RecentOrders.Any())
+                {
+                    <div class="text-center py-5 text-muted">
+                        <div class="rounded-circle bg-light p-3 d-inline-flex mb-2">
+                            <i class="bi bi-cart-x fs-2 text-muted"></i>
+                        </div>
+                        <p class="small mb-0">No customer orders placed for your store products yet.</p>
+                        <span class="small text-muted">Orders containing your items will appear here automatically.</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-muted small text-uppercase">
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Your Subtotal</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var ord in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="fw-bold text-dark d-block">@ord.OrderNumber</span>
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary" style="font-size: 0.72rem;">@ord.OrderStatus</span>
+                                        </td>
+                                        <td>
+                                            <span class="fw-medium text-dark">@ord.CustomerName</span>
+                                        </td>
+                                        <td class="small text-muted">
+                                            @ord.OrderDate.ToString("dd MMM, hh:mm tt")
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">@ord.VendorItemCount pcs</span>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-indigo" style="color: #4f46e5;">₹@ord.VendorTotal.ToString("N2")</span>
+                                        </td>
+                                        <td>
+                                            <a asp-area="Vendor" asp-controller="Orders" asp-action="Details" asp-route-id="@ord.OrderId" class="btn btn-sm btn-outline-secondary rounded-2">
+                                                <i class="bi bi-eye"></i> Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

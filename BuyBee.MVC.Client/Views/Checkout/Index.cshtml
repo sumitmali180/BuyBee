@@ -1,0 +1,506 @@
+@model EMart.ViewModels.CheckoutVM
+
+@{
+    ViewData["Title"] = "Secure Checkout - Buybee";
+}
+
+<div class="container py-4 py-md-5">
+    <!-- Header -->
+    <div class="mb-4 pb-2 border-bottom">
+        <h1 class="h2 fw-bold mb-1 d-flex align-items-center gap-2">
+            <i class="bi bi-shield-lock text-warning"></i>
+            Order Checkout
+        </h1>
+        <p class="text-muted small mb-0">
+            Confirm your delivery address and choose a payment method to complete purchase
+        </p>
+    </div>
+
+    <form id="checkoutForm" asp-controller="Checkout" asp-action="PlaceOrder" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="CouponCode" />
+        <input type="hidden" asp-for="Discount" />
+
+        <div class="row g-4">
+            <!-- Left: Delivery & Payment Options -->
+            <div class="col-lg-8">
+                <!-- Delivery Address Card -->
+                <div class="card border p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                                <i class="bi bi-geo-alt text-warning"></i> 1. Delivery Address
+                            </h2>
+                            <small class="text-muted">Select where your shipment will arrive</small>
+                        </div>
+                        <a asp-controller="Address" asp-action="Create" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-lg me-1"></i> Add Address
+                        </a>
+                    </div>
+
+                    @if (Model.Addresses != null && Model.Addresses.Any())
+                    {
+                        <div class="row g-3">
+                            @foreach (var address in Model.Addresses)
+                            {
+                                <div class="col-md-6">
+                                    <label class="w-100 mb-0 cursor-pointer">
+                                        <input type="radio"
+                                               asp-for="SelectedAddressId"
+                                               value="@address.AddressId"
+                                               class="btn-check address-radio"
+                                               autocomplete="off" />
+                                        <div class="border rounded-3 p-3 h-100 select-card transition-all">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="rounded-circle bg-light p-2 text-warning fs-5">
+                                                    <i class="bi bi-house-door"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-bold text-dark mb-1">Shipping Address</div>
+                                                    <div class="small text-secondary mb-1">@address.AddressLine1</div>
+                                                    <div class="small text-secondary mb-1">@address.City, @address.State</div>
+                                                    <div class="small text-muted">PIN: <strong>@address.Pincode</strong></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <span asp-validation-for="SelectedAddressId" class="text-danger small mt-2 d-block"></span>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 bg-light rounded-3">
+                            <i class="bi bi-geo-alt text-muted fs-1 d-block mb-2"></i>
+                            <h3 class="h6 fw-bold mb-1">No Delivery Address Found</h3>
+                            <p class="text-muted small mb-3">Please provide an address to proceed with your order.</p>
+                            <a asp-controller="Address" asp-action="Create" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-lg me-1"></i> Add New Address
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <!-- Payment Method Card -->
+                <div class="card border p-4 mb-4">
+                    <div class="mb-3 pb-2 border-bottom">
+                        <h2 class="h5 fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-credit-card text-warning"></i> 2. Payment Method
+                        </h2>
+                        <small class="text-muted">Choose your preferred payment method</small>
+                    </div>
+
+                    <!-- Cash on Delivery -->
+                    <label class="w-100 mb-3 cursor-pointer">
+                        <input type="radio"
+                               asp-for="PaymentMethod"
+                               value="COD"
+                               class="btn-check payment-radio"
+                               autocomplete="off" />
+                        <div class="border rounded-3 p-3 select-card transition-all">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-light p-2 text-success fs-5">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Cash on Delivery (COD)</div>
+                                    <small class="text-muted">Pay in cash or UPI when your package arrives.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Online Payment -->
+                    <label class="w-100 cursor-pointer">
+                        <input type="radio"
+                               asp-for="PaymentMethod"
+                               value="ONLINE"
+                               class="btn-check payment-radio"
+                               autocomplete="off" />
+                        <div class="border rounded-3 p-3 select-card transition-all">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle bg-light p-2 text-warning fs-5">
+                                    <i class="bi bi-lightning-charge-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Online Payment (Cards / UPI / NetBanking)</div>
+                                    <small class="text-muted">Instant payment confirmation with secure simulated gateway.</small>
+                                </div>
+                            </div>
+
+                            <div id="onlinePaymentDetails" class="mt-3 pt-3 border-top" style="display: none;">
+                                <div class="alert alert-info py-2 px-3 small mb-3">
+                                    <i class="bi bi-info-circle me-1"></i> Sandbox Test Mode enabled: Payment is automatically confirmed upon placing order.
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-sm-6">
+                                        <label class="form-label small text-muted">UPI ID (Simulated)</label>
+                                        <input type="text" class="form-control form-control-sm" placeholder="user@upi" value="customer@buybee" readonly />
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label class="form-label small text-muted">Card Option (Simulated)</label>
+                                        <input type="text" class="form-control form-control-sm" placeholder="XXXX-XXXX-XXXX-4242" value="•••• •••• •••• 4242" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Return to Shopping Bag
+                </a>
+            </div>
+
+            <!-- Right: Order Breakdown -->
+            <div class="col-lg-4">
+                <div class="card border p-4" style="position: sticky; top: 85px;">
+                    <h3 class="h5 fw-bold mb-3 pb-2 border-bottom text-dark">Order Items (@Model.CartItems.Count)</h3>
+
+                    <!-- Mini item scroll list -->
+                    <div class="pe-1 mb-3" style="max-height: 220px; overflow-y: auto;">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            var itemTotal = item.Price * item.Quantity;
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-light">
+                                <div class="pe-2 text-truncate" style="max-width: 200px;">
+                                    <div class="small fw-semibold text-dark text-truncate" title="@item.ProductName">
+                                        @item.ProductName
+                                    </div>
+                                    <small class="text-muted">Qty: @item.Quantity × ₹@item.Price.ToString("N2")</small>
+                                </div>
+                                <span class="small fw-bold text-dark text-nowrap">₹@itemTotal.ToString("N2")</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- BeeCoins Loyalty Card -->
+                    <div class="card border rounded-3 p-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fs-5">🪙</span>
+                                <div>
+                                    <div class="fw-bold small text-dark">Redeem BeeCoins</div>
+                                    <div class="text-muted" style="font-size: 11px;">Available: <strong class="text-warning font-monospace">@Model.AvailableBeeCoins</strong> Coins (Worth ₹@Model.AvailableBeeCoins)</div>
+                                </div>
+                            </div>
+                            @if (Model.AvailableBeeCoins > 0)
+                            {
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="chkUseBeeCoins" @(Model.CoinsToRedeem > 0 ? "checked" : "") style="cursor: pointer;" />
+                                </div>
+                            }
+                        </div>
+
+                        @if (Model.AvailableBeeCoins > 0)
+                        {
+                            <div id="beeCoinsInputSection" class="mt-2 pt-2 border-top" style="@(Model.CoinsToRedeem > 0 ? "" : "display: none;")">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white text-muted">Coins:</span>
+                                    <input type="number" id="txtBeeCoinsToUse" class="form-control font-monospace" 
+                                           value="@(Model.CoinsToRedeem > 0 ? Model.CoinsToRedeem : Math.Min(Model.AvailableBeeCoins, (int)Model.GrandTotal))" 
+                                           min="1" max="@Model.AvailableBeeCoins" />
+                                    <button type="button" id="btnApplyBeeCoins" class="btn btn-warning text-dark fw-bold">Apply</button>
+                                    @if (Model.CoinsToRedeem > 0)
+                                    {
+                                        <button type="button" id="btnRemoveBeeCoins" class="btn btn-outline-danger">Remove</button>
+                                    }
+                                </div>
+                                <div class="small text-success mt-1 fw-semibold" id="beeCoinsMsg">
+                                    @(Model.CoinsToRedeem > 0 ? $"🪙 {Model.CoinsToRedeem} BeeCoins applied (-₹{Model.CoinsToRedeem}.00)" : "")
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="small text-muted fst-italic mt-1" style="font-size: 11px;">No BeeCoins available yet. Earn 5% on this order!</div>
+                        }
+                    </div>
+
+                    <!-- Price breakdown -->
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Subtotal</span>
+                        <span class="fw-semibold text-dark">₹@Model.Subtotal.ToString("N2")</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Shipping</span>
+                        <span class="badge bg-success">FREE</span>
+                    </div>
+
+                    @if (Model.Discount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 small text-success align-items-center bg-success bg-opacity-10 p-2 rounded-2">
+                            <span><i class="bi bi-tag-fill me-1"></i> Promo Discount @(string.IsNullOrEmpty(Model.CouponCode) ? "" : $"({Model.CouponCode})")</span>
+                            <span class="fw-bold">-₹@Model.Discount.ToString("N2")</span>
+                        </div>
+                    }
+
+                    @if (Model.BeeCoinsDiscount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 small align-items-center bg-dark text-warning p-2 rounded-2 shadow-sm">
+                            <span><i class="bi bi-coin text-warning me-1"></i> BeeCoins Redeemed (@Model.CoinsToRedeem coins)</span>
+                            <span class="fw-bold text-warning font-monospace">-₹@Model.BeeCoinsDiscount.ToString("N2")</span>
+                        </div>
+                    }
+
+                    <hr class="my-3" />
+
+                    <div class="d-flex justify-content-between align-items-baseline mb-3">
+                        <span class="fw-bold text-dark fs-6">Grand Total</span>
+                        <span class="display-6 fw-bold text-dark" style="font-size: 1.6rem;">
+                            ₹@Model.GrandTotal.ToString("N2")
+                        </span>
+                    </div>
+
+                    <!-- BeeCoins to Earn Notice -->
+                    <div class="p-2 bg-warning bg-opacity-10 border border-warning border-opacity-50 rounded-2 small text-center mb-3 text-dark">
+                        <i class="bi bi-gift-fill text-warning me-1"></i> You will earn <strong class="text-amber">+@Model.EstimatedCoinsToEarn BeeCoins</strong> (5% cashback) on this order!
+                    </div>
+
+                    @if (Model.Addresses != null && Model.Addresses.Any())
+                    {
+                        <button type="submit" id="btnPlaceOrder" class="btn btn-warning btn-lg w-100 fw-bold text-dark shadow-sm">
+                            <i class="bi bi-shield-check me-1"></i> Place Order Now
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-secondary btn-lg w-100" disabled>
+                            Add Address to Place Order
+                        </button>
+                    }
+
+                    <div class="text-center mt-3 text-muted small">
+                        <i class="bi bi-lock-fill text-success me-1"></i>
+                        Safe & encrypted 256-Bit checkout
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Simulated Online Payment Gateway Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header bg-dark text-white p-3 border-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-warning text-dark p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="bi bi-shield-lock-fill fs-6"></i>
+                    </div>
+                    <div>
+                        <h6 class="modal-title fw-bold mb-0 text-white" id="paymentModalLabel">Buybee Secure Payment Gateway</h6>
+                        <small class="text-secondary" style="font-size: 11px;">256-Bit SSL Encrypted Sandbox</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div class="text-center mb-4">
+                    <span class="text-muted small">Total Payable Amount</span>
+                    <h3 class="fw-bold text-dark mb-0">₹@Model.GrandTotal.ToString("N2")</h3>
+                </div>
+
+                <ul class="nav nav-pills nav-fill mb-3 bg-white p-1 rounded-3 border" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active py-2 text-dark fw-semibold" id="pills-upi-tab" data-bs-toggle="pill" data-bs-target="#pills-upi" type="button" role="tab">
+                            <i class="bi bi-qr-code-scan me-1 text-warning"></i> UPI / QR
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link py-2 text-dark fw-semibold" id="pills-card-tab" data-bs-toggle="pill" data-bs-target="#pills-card" type="button" role="tab">
+                            <i class="bi bi-credit-card-2-front-fill me-1 text-warning"></i> Card
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content bg-white p-3 rounded-3 border mb-3" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-upi" role="tabpanel">
+                        <div class="text-center py-2">
+                            <div class="bg-light p-3 rounded-3 d-inline-block border mb-2">
+                                <i class="bi bi-qr-code text-dark" style="font-size: 80px;"></i>
+                            </div>
+                            <p class="small text-muted mb-2">Scan with Google Pay, PhonePe, or Paytm</p>
+                            <input type="text" class="form-control form-control-sm text-center fw-semibold bg-light" value="buybee.merchant@icici" readonly />
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-card" role="tabpanel">
+                        <div class="mb-2">
+                            <label class="form-label small text-muted mb-1">Card Number</label>
+                            <input type="text" class="form-control form-control-sm" value="•••• •••• •••• 4242" readonly />
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">Expiry</label>
+                                <input type="text" class="form-control form-control-sm" value="12/28" readonly />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">CVV</label>
+                                <input type="text" class="form-control form-control-sm" value="•••" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="paymentStatus" class="alert alert-success d-none py-2 text-center small">
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span id="paymentStatusText">Verifying with bank...</span>
+                </div>
+
+                <button type="button" id="btnConfirmPayment" class="btn btn-warning w-100 fw-bold py-2.5 text-dark shadow-sm">
+                    <i class="bi bi-lock-fill me-1"></i> Authorize &amp; Pay ₹@Model.GrandTotal.ToString("N2")
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    .select-card {
+        background-color: var(--bb-white);
+        border: 1px solid var(--bb-border) !important;
+        transition: all 0.2s ease;
+    }
+    .select-card:hover {
+        border-color: var(--bb-amber) !important;
+        box-shadow: var(--bb-shadow-sm);
+    }
+    .btn-check:checked + .select-card {
+        border-color: var(--bb-amber) !important;
+        background-color: var(--bb-amber-50) !important;
+        box-shadow: 0 0 0 1px var(--bb-amber);
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const onlineDetails = document.getElementById("onlinePaymentDetails");
+            const paymentRadios = document.querySelectorAll("input[name='PaymentMethod']");
+            const checkoutForm = document.getElementById("checkoutForm");
+            const btnPlaceOrder = document.getElementById("btnPlaceOrder");
+            const btnConfirmPayment = document.getElementById("btnConfirmPayment");
+            const paymentStatus = document.getElementById("paymentStatus");
+            const paymentStatusText = document.getElementById("paymentStatusText");
+
+            function toggleOnlineDetails() {
+                const checkedRadio = document.querySelector("input[name='PaymentMethod']:checked");
+                if (checkedRadio && checkedRadio.value === "ONLINE") {
+                    if (onlineDetails) onlineDetails.style.display = "block";
+                } else {
+                    if (onlineDetails) onlineDetails.style.display = "none";
+                }
+            }
+
+            paymentRadios.forEach(r => r.addEventListener("change", toggleOnlineDetails));
+            toggleOnlineDetails();
+
+            if (checkoutForm && btnPlaceOrder) {
+                checkoutForm.addEventListener("submit", function (e) {
+                    const checkedRadio = document.querySelector("input[name='PaymentMethod']:checked");
+                    if (checkedRadio && checkedRadio.value === "ONLINE" && !checkoutForm.dataset.paymentVerified) {
+                        e.preventDefault();
+                        const modalEl = document.getElementById("paymentModal");
+                        if (modalEl && window.bootstrap) {
+                            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                            modal.show();
+                        }
+                    }
+                });
+            }
+
+            if (btnConfirmPayment && checkoutForm) {
+                btnConfirmPayment.addEventListener("click", function () {
+                    btnConfirmPayment.disabled = true;
+                    btnConfirmPayment.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...';
+                    if (paymentStatus) {
+                        paymentStatus.classList.remove("d-none");
+                        if (paymentStatusText) paymentStatusText.textContent = "Connecting to banking network...";
+                    }
+
+                    setTimeout(() => {
+                        if (paymentStatusText) paymentStatusText.textContent = "Payment Verified! Placing your order...";
+                        setTimeout(() => {
+                            checkoutForm.dataset.paymentVerified = "true";
+                            checkoutForm.submit();
+                        }, 700);
+                    }, 1200);
+                });
+            }
+
+            // BeeCoins Handlers
+            const chkUseBeeCoins = document.getElementById("chkUseBeeCoins");
+            const beeCoinsSection = document.getElementById("beeCoinsInputSection");
+            const btnApplyBeeCoins = document.getElementById("btnApplyBeeCoins");
+            const btnRemoveBeeCoins = document.getElementById("btnRemoveBeeCoins");
+            const txtBeeCoinsToUse = document.getElementById("txtBeeCoinsToUse");
+
+            if (chkUseBeeCoins) {
+                chkUseBeeCoins.addEventListener("change", function () {
+                    if (this.checked) {
+                        if (beeCoinsSection) beeCoinsSection.style.display = "block";
+                        if (btnApplyBeeCoins) btnApplyBeeCoins.click();
+                    } else {
+                        if (beeCoinsSection) beeCoinsSection.style.display = "none";
+                        if (btnRemoveBeeCoins) btnRemoveBeeCoins.click();
+                    }
+                });
+            }
+
+            if (btnApplyBeeCoins && txtBeeCoinsToUse) {
+                btnApplyBeeCoins.addEventListener("click", async function () {
+                    const coins = parseInt(txtBeeCoinsToUse.value) || 0;
+                    if (coins <= 0) {
+                        alert("Please enter a valid amount of BeeCoins.");
+                        return;
+                    }
+
+                    btnApplyBeeCoins.disabled = true;
+                    btnApplyBeeCoins.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+                    try {
+                        const resp = await fetch('/BeeCoins/Apply', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ coins: coins })
+                        });
+                        const res = await resp.json();
+                        if (res.success) {
+                            window.location.reload();
+                        } else {
+                            alert(res.message || "Unable to apply BeeCoins.");
+                            btnApplyBeeCoins.disabled = false;
+                            btnApplyBeeCoins.textContent = "Apply";
+                        }
+                    } catch (e) {
+                        alert("Error connecting to server.");
+                        btnApplyBeeCoins.disabled = false;
+                        btnApplyBeeCoins.textContent = "Apply";
+                    }
+                });
+            }
+
+            if (btnRemoveBeeCoins) {
+                btnRemoveBeeCoins.addEventListener("click", async function () {
+                    btnRemoveBeeCoins.disabled = true;
+                    try {
+                        const resp = await fetch('/BeeCoins/Remove', { method: 'POST' });
+                        const res = await resp.json();
+                        if (res.success) {
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        btnRemoveBeeCoins.disabled = false;
+                    }
+                });
+            }
+        });
+    </script>
+}

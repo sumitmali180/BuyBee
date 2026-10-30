@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <ellipse cx="100" cy="30" rx="86" ry="24" fill="#034EA2"/>
+  <text x="100" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="21" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="4">SAMSUNG</text>
+</svg>

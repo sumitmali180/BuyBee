@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <path d="M18 14h164v32H18z" fill="#ED1B2D" rx="6"/>
+  <path d="M30 42c30 4 110 4 140 0-30 0-110 0-140 0z" fill="#ffffff"/>
+  <text x="100" y="37" font-family="'Trebuchet MS', Arial Black, sans-serif" font-size="22" font-weight="900" font-style="italic" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">Colgate</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <path d="M24 16h32v28H24z" fill="#00529B" rx="4"/>
+  <text x="40" y="34" font-family="Arial, sans-serif" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1">TATA</text>
+  <path d="M68 34c4-12 18-12 24-2-4 10-18 8-24 2z" fill="#007A3D"/>
+  <text x="136" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="900" fill="#007A3D" text-anchor="middle" letter-spacing="1">TEA</text>
+</svg>

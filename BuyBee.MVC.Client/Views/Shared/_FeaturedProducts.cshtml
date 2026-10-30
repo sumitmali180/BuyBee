@@ -1,0 +1,100 @@
+@model IEnumerable<EMart.Models.Products>
+
+@if (Model != null && Model.Any())
+{
+    <section class="py-5">
+        <div class="container">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+                <div>
+                    <div class="d-inline-flex align-items-center gap-1 text-warning fw-bold small text-uppercase mb-1">
+                        <i class="bi bi-award-fill"></i> Editor's Choice
+                    </div>
+                    <h2 class="fw-bold mb-1">Featured Highlights</h2>
+                    <p class="text-muted mb-0 small">Handpicked items selected for quality, rating, and durability</p>
+                </div>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm align-self-start align-self-sm-center">
+                    Explore All <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+                @foreach (var product in Model)
+                {
+                    <div class="col">
+                        <div class="bb-product-card">
+                            <div class="bb-product-thumb-wrap">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" class="d-contents">
+                                    <img src="@(string.IsNullOrEmpty(product.ThumbnailImage) ? "/images/no-image.png" : product.ThumbnailImage)"
+                                         class="bb-product-thumb"
+                                         loading="lazy"
+                                         alt="@product.ProductName"
+                                         onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                                </a>
+                                <div class="bb-product-badge-group">
+                                    <span class="badge bg-primary text-dark">Featured</span>
+                                </div>
+                                <button type="button"
+                                        class="btn btn-light btn-sm rounded-circle shadow-sm position-absolute top-0 end-0 m-2 bb-wishlist-toggle p-0 d-flex align-items-center justify-content-center border"
+                                        style="width: 32px; height: 32px; z-index: 2;"
+                                        data-product-id="@product.ProductId"
+                                        aria-label="Toggle Wishlist"
+                                        title="Save to Wishlist">
+                                    <i class="bi bi-heart text-danger" style="font-size: 14px;"></i>
+                                </button>
+                            </div>
+
+                            <div class="bb-product-content">
+                                @if (!string.IsNullOrEmpty(product.BrandName))
+                                {
+                                    <div class="bb-product-brand">@product.BrandName</div>
+                                }
+
+                                <h3 class="bb-product-title">
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId">
+                                        @product.ProductName
+                                    </a>
+                                </h3>
+
+                                <div class="bb-product-rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                    <span class="bb-product-rating-count">(4.8)</span>
+                                </div>
+
+                                <div class="bb-product-pricing">
+                                    <span class="bb-product-price">₹@(product.Price?.ToString("N2") ?? "0.00")</span>
+                                </div>
+
+                                <div class="bb-product-actions">
+                                    @if (product.Quantity > 0)
+                                    {
+                                        <form asp-controller="Cart"
+                                              asp-action="AddToCart"
+                                              method="post"
+                                              class="add-to-cart-form w-100">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@product.ProductId" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                <i class="bi bi-bag-plus me-1"></i> Add to Bag
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                                            Unavailable
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}

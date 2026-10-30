@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>@ViewData["Title"] - Buybee Express Delivery Partner</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 & Bootstrap Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --delivery-primary: #059669;
+            --delivery-primary-hover: #047857;
+            --delivery-dark: #064e3b;
+            --delivery-light: #ecfdf5;
+            --delivery-accent: #f59e0b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding-bottom: 75px; /* Spacing for bottom navigation on mobile */
+        }
+
+        /* Top Navigation Header */
+        .delivery-topbar {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            box-shadow: 0 4px 12px rgba(6, 78, 59, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+
+        /* Mobile Sticky Bottom Navigation */
+        .delivery-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+            z-index: 1030;
+            height: 62px;
+        }
+
+        .delivery-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 600;
+            flex: 1;
+            padding: 4px 0;
+            transition: all 0.2s ease;
+        }
+
+        .delivery-nav-item i {
+            font-size: 1.35rem;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .delivery-nav-item.active,
+        .delivery-nav-item:hover {
+            color: var(--delivery-primary);
+        }
+
+        /* Pulsating Online Status Indicator */
+        .status-pulse {
+            width: 9px;
+            height: 9px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @@keyframes pulse-green {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Polished UI Cards */
+        .delivery-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .delivery-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Order Status Badges */
+        .badge-status-assigned { background-color: #e0f2fe; color: #0369a1; }
+        .badge-status-outfordelivery { background-color: #fef3c7; color: #b45309; }
+        .badge-status-delivered { background-color: #d1fae5; color: #047857; }
+        .badge-status-failed { background-color: #fee2e2; color: #b91c1c; }
+        .badge-status-returned { background-color: #f1f5f9; color: #475569; }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <!-- Top Header Bar -->
+    <header class="delivery-topbar py-2 px-3 text-white">
+        <div class="container-fluid max-w-7xl d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <a asp-area="Delivery" asp-controller="Dashboard" asp-action="Index" class="text-white text-decoration-none d-flex align-items-center gap-2">
+                    <div class="bg-white bg-opacity-15 p-2 rounded-3 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-truck text-warning fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold lh-1 fs-6">Buybee Express</div>
+                        <span class="badge bg-black bg-opacity-25 text-white-50 font-monospace" style="font-size: 0.65rem;">PARTNER DISPATCH</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Driver Identity & Actions -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-none d-sm-flex align-items-center gap-2 bg-white bg-opacity-10 py-1 px-2 rounded-pill">
+                    <span class="status-pulse"></span>
+                    <span class="small fw-semibold text-light">@User.Identity?.Name</span>
+                </div>
+
+                <!-- Active Link To Customer Storefront -->
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-sm btn-outline-light d-none d-md-inline-flex align-items-center gap-1">
+                    <i class="bi bi-shop"></i> Storefront
+                </a>
+
+                <!-- Logout Form -->
+                <form asp-area="Delivery" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-danger bg-white bg-opacity-10 text-white border-0 px-2 py-1" title="Sign Out">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span class="d-none d-sm-inline ms-1">Exit</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages Container -->
+    <div class="container mt-3">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div class="flex-grow-1">@TempData["Success"]</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <div class="flex-grow-1">@TempData["Error"]</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+    <!-- Main Content Body -->
+    <main role="main" class="container py-2">
+        @RenderBody()
+    </main>
+
+    <!-- Mobile-First Sticky Bottom Nav -->
+    <nav class="delivery-bottom-nav d-flex align-items-center justify-content-around">
+        <a asp-area="Delivery" asp-controller="Dashboard" asp-action="Index"
+           class="delivery-nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </a>
+        <a asp-area="Delivery" asp-controller="Order" asp-action="Index" asp-route-status="Out for Delivery"
+           class="delivery-nav-item @(Context.Request.Query["status"] == "Out for Delivery" ? "active" : "")">
+            <i class="bi bi-bicycle"></i>
+            <span>Active Runs</span>
+        </a>
+        <a asp-area="Delivery" asp-controller="Order" asp-action="Index"
+           class="delivery-nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Order" && Context.Request.Query["status"] != "Out for Delivery" ? "active" : "")">
+            <i class="bi bi-box-seam"></i>
+            <span>Deliveries</span>
+        </a>
+        <a asp-area="Delivery" asp-controller="Dashboard" asp-action="ShiftSummary"
+           class="delivery-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "ShiftSummary" ? "active" : "")">
+            <i class="bi bi-cash-coin"></i>
+            <span>Cash Handover</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,117 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+
+<div class="p-3 text-white">
+    <div class="text-uppercase text-muted small fw-bold px-3 pt-2 pb-2 tracking-wider" style="font-size: 0.72rem; letter-spacing: 0.08em;">
+        Core Navigation
+    </div>
+
+    <div class="nav flex-column gap-1 mb-4">
+        <a asp-area="Admin"
+           asp-controller="Dashboard"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Dashboard" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-speedometer2 fs-5 @(currentController == "Dashboard" ? "text-dark" : "text-amber")"></i>
+            <span>Dashboard</span>
+        </a>
+    </div>
+
+    <div class="text-uppercase text-muted small fw-bold px-3 pt-2 pb-2 tracking-wider" style="font-size: 0.72rem; letter-spacing: 0.08em;">
+        Catalog & Inventory
+    </div>
+
+    <div class="nav flex-column gap-1 mb-4">
+        <a asp-area="Admin"
+           asp-controller="Products"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Products" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-box-seam fs-5 @(currentController == "Products" ? "text-dark" : "text-amber")"></i>
+            <span>Products</span>
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Categories"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Categories" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-grid fs-5 @(currentController == "Categories" ? "text-dark" : "text-amber")"></i>
+            <span>Categories</span>
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="SubCategories"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "SubCategories" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-diagram-3 fs-5 @(currentController == "SubCategories" ? "text-dark" : "text-amber")"></i>
+            <span>Sub Categories</span>
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Brands"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Brands" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-bricks fs-5 @(currentController == "Brands" ? "text-dark" : "text-amber")"></i>
+            <span>Brands</span>
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Units"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Units" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-rulers fs-5 @(currentController == "Units" ? "text-dark" : "text-amber")"></i>
+            <span>Measurement Units</span>
+        </a>
+    </div>
+
+    <div class="text-uppercase text-muted small fw-bold px-3 pt-2 pb-2 tracking-wider" style="font-size: 0.72rem; letter-spacing: 0.08em;">
+        Commerce & Fulfillment
+    </div>
+
+    <div class="nav flex-column gap-1 mb-4">
+        <a asp-area="Admin"
+           asp-controller="Order"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Order" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-cart-check fs-5 @(currentController == "Order" ? "text-dark" : "text-amber")"></i>
+            <span>Orders</span>
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Coupon"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Coupon" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-tag-fill fs-5 @(currentController == "Coupon" ? "text-dark" : "text-amber")"></i>
+            <span>Coupons & Promos</span>
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Reports"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Reports" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-file-earmark-bar-graph fs-5 @(currentController == "Reports" ? "text-dark" : "text-amber")"></i>
+            <span>Reports</span>
+        </a>
+    </div>
+
+    <div class="text-uppercase text-muted small fw-bold px-3 pt-2 pb-2 tracking-wider" style="font-size: 0.72rem; letter-spacing: 0.08em;">
+        Administration
+    </div>
+
+    <div class="nav flex-column gap-1">
+        <a asp-area="Admin"
+           asp-controller="Users"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Users" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-people-fill fs-5 @(currentController == "Users" ? "text-dark" : "text-amber")"></i>
+            <span>Staff Users</span>
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Roles"
+           asp-action="Index"
+           class="nav-link d-flex align-items-center gap-3 px-3 py-2 rounded-2 text-white text-opacity-75 @(currentController == "Roles" ? "bg-amber text-dark fw-bold" : "hover-bg-zinc")">
+            <i class="bi bi-person-badge fs-5 @(currentController == "Roles" ? "text-dark" : "text-amber")"></i>
+            <span>Roles & Permissions</span>
+        </a>
+    </div>
+</div>

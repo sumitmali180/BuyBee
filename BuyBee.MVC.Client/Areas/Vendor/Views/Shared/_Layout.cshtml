@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Buybee Merchant Hub</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 & Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --vendor-primary: #4f46e5;
+            --vendor-primary-dark: #3730a3;
+            --vendor-primary-light: #e0e7ff;
+            --vendor-slate: #0f172a;
+            --vendor-sidebar-bg: #111827;
+            --vendor-card-border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .vendor-sidebar {
+            background-color: var(--vendor-sidebar-bg);
+            min-height: 100vh;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            width: 260px;
+            transition: all 0.3s ease;
+        }
+
+        .vendor-brand {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .vendor-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            color: #94a3b8;
+            border-radius: 0.5rem;
+            margin: 0.2rem 0.75rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .vendor-nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .vendor-nav-link.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .vendor-nav-link i {
+            font-size: 1.15rem;
+        }
+
+        /* Topbar Styling */
+        .vendor-topbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.85rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Card Styles */
+        .vendor-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid var(--vendor-card-border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .vendor-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06);
+        }
+
+        .badge-vendor-pill {
+            background-color: var(--vendor-primary-light);
+            color: var(--vendor-primary-dark);
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.78rem;
+        }
+
+        .btn-vendor {
+            background-color: var(--vendor-primary);
+            border-color: var(--vendor-primary);
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-vendor:hover {
+            background-color: var(--vendor-primary-dark);
+            border-color: var(--vendor-primary-dark);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .table-responsive {
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar Navigation -->
+        <aside class="vendor-sidebar d-none d-lg-flex flex-column flex-shrink-0">
+            <a asp-area="Vendor" asp-controller="Dashboard" asp-action="Index" class="vendor-brand">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-3 text-white" style="width: 38px; height: 38px; background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);">
+                    <i class="bi bi-shop fs-5"></i>
+                </div>
+                <div>
+                    <span class="d-block fw-bold text-white fs-6 lh-1">Buybee</span>
+                    <span class="text-indigo-400 small text-uppercase fw-semibold" style="font-size: 0.68rem; color: #a5b4fc; letter-spacing: 0.05em;">Merchant Hub</span>
+                </div>
+            </a>
+
+            <!-- Store Profile Mini Card -->
+            <div class="p-3 mx-2 my-2 rounded-3" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06);">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 10px; height: 10px;"></div>
+                    <span class="text-white fw-semibold small text-truncate" title="@User.FindFirst("StoreName")?.Value">
+                        @(User.FindFirst("StoreName")?.Value ?? "My Merchant Store")
+                    </span>
+                </div>
+                <span class="text-muted d-block mt-1" style="font-size: 0.72rem;">
+                    Vendor ID: #@(User.FindFirst("VendorId")?.Value ?? "1") &bull; Verified
+                </span>
+            </div>
+
+            <nav class="nav flex-column flex-grow-1 py-2">
+                @{
+                    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                    string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                }
+
+                <a asp-area="Vendor" asp-controller="Dashboard" asp-action="Index" class="vendor-nav-link @(currentController == "Dashboard" ? "active" : "")">
+                    <i class="bi bi-grid-1x2"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a asp-area="Vendor" asp-controller="Products" asp-action="Index" class="vendor-nav-link @(currentController == "Products" ? "active" : "")">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Products Catalog</span>
+                </a>
+
+                <a asp-area="Vendor" asp-controller="Inventory" asp-action="Index" class="vendor-nav-link @(currentController == "Inventory" ? "active" : "")">
+                    <i class="bi bi-layers"></i>
+                    <span>Inventory & Restock</span>
+                </a>
+
+                <a asp-area="Vendor" asp-controller="Orders" asp-action="Index" class="vendor-nav-link @(currentController == "Orders" ? "active" : "")">
+                    <i class="bi bi-bag-check"></i>
+                    <span>Orders & Packing</span>
+                </a>
+
+                <a asp-area="Vendor" asp-controller="Reports" asp-action="Index" class="vendor-nav-link @(currentController == "Reports" ? "active" : "")">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span>Sales & Settlements</span>
+                </a>
+
+                <a asp-area="Vendor" asp-controller="Profile" asp-action="Index" class="vendor-nav-link @(currentController == "Profile" ? "active" : "")">
+                    <i class="bi bi-gear"></i>
+                    <span>Store Settings</span>
+                </a>
+
+                <hr class="mx-3 my-3" style="border-color: rgba(255,255,255,0.08);" />
+
+                <a href="/" target="_blank" class="vendor-nav-link text-muted">
+                    <i class="bi bi-arrow-up-right-square"></i>
+                    <span>Customer Storefront</span>
+                </a>
+            </nav>
+
+            <div class="p-3 border-top border-secondary border-opacity-25">
+                <form asp-area="Vendor" asp-controller="Account" asp-action="Logout" method="post" id="vendorLogoutForm">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2 rounded-2">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Sign Out</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="d-flex flex-column flex-grow-1 min-vh-100">
+            <!-- Topbar -->
+            <header class="vendor-topbar d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-lg-none">
+                        <a asp-area="Vendor" asp-controller="Dashboard" asp-action="Index" class="btn btn-light btn-sm rounded-circle p-2">
+                            <i class="bi bi-shop text-primary fs-5"></i>
+                        </a>
+                    </div>
+                    <div>
+                        <span class="badge badge-vendor-pill d-none d-sm-inline-block me-2">Vendor Partner</span>
+                        <span class="fw-bold text-dark fs-6">@(User.FindFirst("StoreName")?.Value ?? "Merchant Portal")</span>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <a asp-area="Vendor" asp-controller="Products" asp-action="Create" class="btn btn-vendor btn-sm d-inline-flex align-items-center gap-1 shadow-sm px-3">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Add Product</span>
+                    </a>
+
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3 py-1 border" type="button" data-bs-toggle="dropdown">
+                            <div class="bg-indigo rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; background: #4f46e5; font-size: 0.8rem; font-weight: 700;">
+                                @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "V")
+                            </div>
+                            <span class="small fw-semibold text-dark d-none d-md-inline">@User.Identity?.Name</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                            <li>
+                                <a asp-area="Vendor" asp-controller="Profile" asp-action="Index" class="dropdown-item small py-2">
+                                    <i class="bi bi-person-gear me-2 text-primary"></i> Store Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/" target="_blank" class="dropdown-item small py-2">
+                                    <i class="bi bi-shop me-2 text-secondary"></i> View Marketplace
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form asp-area="Vendor" asp-controller="Account" asp-action="Logout" method="post" class="px-2">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item small text-danger rounded-2 py-2">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-grow-1 p-3 p-md-4">
+                <!-- Toast Alerts / Flash Messages -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                        <div>@TempData["SuccessMessage"]</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+                        <div>@TempData["ErrorMessage"]</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["WarningMessage"] != null)
+                {
+                    <div class="alert alert-warning alert-dismissible fade show rounded-3 border-0 shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="bi bi-exclamation-circle-fill fs-5 text-warning"></i>
+                        <div>@TempData["WarningMessage"]</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @RenderBody()
+            </main>
+
+            <!-- Vendor Portal Footer -->
+            <footer class="bg-white border-top py-3 px-4 text-muted small d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                <span>&copy; @DateTime.UtcNow.Year Buybee Marketplace. All Rights Reserved.</span>
+                <span>Merchant Support: <code>support@buybee.com</code> &bull; Platform Commission: 10%</span>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

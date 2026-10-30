@@ -1,0 +1,178 @@
+## =========================================================================
+## Buybee E-Commerce & AI Assistant - .gitignore
+## =========================================================================
+
+# --------------------------------------------------------------------------
+# 1. Sensitive Files & Secrets (Security Critical)
+# --------------------------------------------------------------------------
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+**/*.env
+!.env.example
+!**/.env.example
+
+# Authentication cookies, session tokens & credentials
+cookies.txt
+**/cookies.txt
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+id_rsa*
+*.pub
+
+# ASP.NET User Secrets & Local AppSettings
+secrets.json
+appsettings.local.json
+appsettings.*.local.json
+*.local.json
+
+# --------------------------------------------------------------------------
+# 2. .NET Build Artifacts & Intermediate Files
+# --------------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Aa]rchifacts/
+dist/
+publish/
+**/bin/
+**/obj/
+
+# NuGet Packages & cache
+*.nupkg
+*.snupkg
+**/packages/
+!**/packages/build/
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# --------------------------------------------------------------------------
+# 3. User-Specific & Local IDE / Editor Settings
+# --------------------------------------------------------------------------
+# Visual Studio
+.vs/
+*.user
+*.userosv
+*.suo
+*.userprefs
+*.sln.docstates
+
+# JetBrains Rider / IntelliJ
+.idea/
+*.DotSettings.user
+*.idea
+
+# Visual Studio Code (ignore personal workspace state, keep shared tasks/launch)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vscode/*.log
+
+# OmniSharp & Roslyn
+.omnisharp/
+.ionide/
+
+# --------------------------------------------------------------------------
+# 4. OS-Specific Metadata Files
+# --------------------------------------------------------------------------
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.fuse_hidden*
+.Trash-*
+
+# --------------------------------------------------------------------------
+# 5. Application Logs & Diagnostics
+# --------------------------------------------------------------------------
+*.log
+[Ll]og/
+[Ll]ogs/
+ErrorLog/
+**/ErrorLog/
+*.svclog
+
+# Crash dumps & profiling
+*.dmp
+*.dump
+*.mda.dump
+*.crashdump
+*.vsp
+*.vspx
+*.sap
+
+# --------------------------------------------------------------------------
+# 6. Temporary Files & Scratchpad
+# --------------------------------------------------------------------------
+scratch/
+**/scratch/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# --------------------------------------------------------------------------
+# 7. Testing & Code Coverage
+# --------------------------------------------------------------------------
+[Tt]est[Rr]esult*/
+coverage/
+*.coverage
+*.coveragexml
+
+# --------------------------------------------------------------------------
+# 8. Database & Local Storage Files
+# --------------------------------------------------------------------------
+*.mdf
+*.ldf
+*.ndf
+*.sqlite
+*.sqlite3
+*.db
+!*.db-seed
+*.sqlsuo
+
+# --------------------------------------------------------------------------
+# 9. Python (Helpers, Scrapers, Scripts)
+# --------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# --------------------------------------------------------------------------
+# 10. Node.js & Web Assets
+# --------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*

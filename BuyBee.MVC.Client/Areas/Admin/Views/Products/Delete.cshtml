@@ -1,0 +1,91 @@
+@model EMart.ViewModels.ProductVM
+
+@{
+    ViewData["Title"] = "Delete Product - " + Model.Product.ProductName;
+}
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Catalog</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Delete Confirmation</li>
+                </ol>
+            </nav>
+            <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-trash text-danger"></i>
+                <span>Delete: @Model.Product.ProductName</span>
+            </h1>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i>
+            <span>Cancel and Return</span>
+        </a>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input asp-for="Product.ProductId" type="hidden" />
+
+        <div class="bb-card p-4 p-md-5 mb-4">
+            <div class="alert alert-danger d-flex align-items-center gap-3 mb-4 rounded-3 p-3">
+                <i class="bi bi-exclamation-triangle-fill fs-3 text-danger"></i>
+                <div>
+                    <h5 class="fw-bold mb-1">Confirm Product Deletion</h5>
+                    <p class="small mb-0">
+                        Are you sure you want to delete this product? All gallery images and associated catalog listings will be permanently removed.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="small text-muted d-block">SKU Identifier</span>
+                        <span class="fw-semibold text-dark font-monospace">@Model.Product.SKU</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="small text-muted d-block">Product Title</span>
+                        <span class="fw-semibold text-dark">@Model.Product.ProductName</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="small text-muted d-block">Category</span>
+                        <span class="fw-semibold text-dark">@Model.Product.CategoryName</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="small text-muted d-block">Brand</span>
+                        <span class="fw-semibold text-dark">@Model.Product.BrandName</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="small text-muted d-block">Unit Price</span>
+                        <span class="fw-bold text-amber">₹@Model.Product.Price?.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="small text-muted d-block">Current Stock</span>
+                        <span class="fw-bold text-dark font-monospace">@Model.Product.Quantity units</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 pb-5">
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="submit" class="btn btn-danger px-4 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-trash"></i>
+                <span>Permanently Delete</span>
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,75 @@
+@model EMart.Models.SubCategories
+
+@{
+    ViewData["Title"] = "Edit Sub Category - " + Model.SubCategoryName;
+}
+
+<div class="container-fluid px-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1 small text-muted">
+                            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Sub Categories</a></li>
+                            <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">Edit</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-pencil-square text-amber"></i>
+                        <span>Edit: @Model.SubCategoryName</span>
+                    </h1>
+                </div>
+
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Back</span>
+                </a>
+            </div>
+
+            <div class="bb-card p-4 p-md-5">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="SubCategoryId" type="hidden" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-4"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="CategoryId" class="form-label small text-muted fw-semibold">Parent Category *</label>
+                        <select asp-for="CategoryId"
+                                asp-items="ViewBag.CategoryList"
+                                class="form-select">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="SubCategoryName" class="form-control" placeholder="Sub Category Name" />
+                        <label asp-for="SubCategoryName">Sub Category Name *</label>
+                        <span asp-validation-for="SubCategoryName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check form-switch p-3 bg-light rounded-3 mb-4 ps-5">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" id="subCatActiveSwitch" />
+                        <label class="form-check-label fw-semibold text-dark" for="subCatActiveSwitch">
+                            Activate & Display in Filtering
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-check-lg"></i>
+                            <span>Update Sub Category</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

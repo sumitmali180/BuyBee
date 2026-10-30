@@ -1,0 +1,163 @@
+@model EMart.ViewModels.PagedResult<EMart.Models.Products>
+
+<section class="py-5">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Trending on Buybee</h2>
+                <p class="text-muted mb-0 small">Handpicked selections across high-demand essentials</p>
+            </div>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-sm align-self-start align-self-sm-center">
+                Browse Full Catalog <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+            @if (Model != null && Model.Items != null && Model.Items.Any())
+            {
+                foreach (var product in Model.Items)
+                {
+                    <div class="col">
+                        <div class="bb-product-card">
+                            <!-- Thumbnail Area -->
+                            <div class="bb-product-thumb-wrap">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" class="d-contents">
+                                    <img src="@(string.IsNullOrEmpty(product.ThumbnailImage) ? "/images/no-image.png" : product.ThumbnailImage)"
+                                         class="bb-product-thumb"
+                                         loading="lazy"
+                                         alt="@product.ProductName"
+                                         onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                                </a>
+
+                                @if (product.Quantity <= 0)
+                                {
+                                    <div class="bb-product-badge-group">
+                                        <span class="badge bg-danger">Out of Stock</span>
+                                    </div>
+                                }
+                                else if (product.Quantity <= 5)
+                                {
+                                    <div class="bb-product-badge-group">
+                                        <span class="badge bg-warning">Only @product.Quantity left</span>
+                                    </div>
+                                }
+
+                                <button type="button"
+                                        class="btn btn-light btn-sm rounded-circle shadow-sm position-absolute top-0 end-0 m-2 bb-wishlist-toggle p-0 d-flex align-items-center justify-content-center border"
+                                        style="width: 32px; height: 32px; z-index: 2;"
+                                        data-product-id="@product.ProductId"
+                                        aria-label="Toggle Wishlist"
+                                        title="Save to Wishlist">
+                                    <i class="bi bi-heart text-danger" style="font-size: 14px;"></i>
+                                </button>
+                            </div>
+
+                            <!-- Content Area -->
+                            <div class="bb-product-content">
+                                @if (!string.IsNullOrEmpty(product.BrandName))
+                                {
+                                    <div class="bb-product-brand">@product.BrandName</div>
+                                }
+
+                                <h3 class="bb-product-title">
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId">
+                                        @product.ProductName
+                                    </a>
+                                </h3>
+
+                                <div class="bb-product-rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                    <span class="bb-product-rating-count">(4.5)</span>
+                                </div>
+
+                                <div class="bb-product-pricing">
+                                    <span class="bb-product-price">₹@(product.Price?.ToString("N2") ?? "0.00")</span>
+                                </div>
+
+                                <div class="bb-product-actions">
+                                    @if (product.Quantity > 0)
+                                    {
+                                        <form asp-controller="Cart"
+                                              asp-action="AddToCart"
+                                              method="post"
+                                              class="add-to-cart-form w-100">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@product.ProductId" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                <i class="bi bi-bag-plus me-1"></i> Add to Bag
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                                            Unavailable
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 py-5 text-center text-muted">
+                    <i class="bi bi-box-seam fs-1 d-block mb-3 opacity-50"></i>
+                    <p class="mb-2">No products available at the moment.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model != null && Model.TotalPages > 1)
+        {
+            <div class="d-flex justify-content-center mt-5">
+                <nav aria-label="Product pagination">
+                    <ul class="pagination">
+                        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-pageNumber="@(Model.PageNumber - 1)"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-searchText="@ViewBag.SearchText"
+                               aria-label="Previous page">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-pageNumber="@i"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-searchText="@ViewBag.SearchText">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-pageNumber="@(Model.PageNumber + 1)"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-searchText="@ViewBag.SearchText"
+                               aria-label="Next page">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</section>

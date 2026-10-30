@@ -1,0 +1,143 @@
+@model List<EMart.ViewModels.DeliveryOrderSummaryVM>
+
+@{
+    ViewData["Title"] = "Deliveries Queue";
+    string currentFilter = ViewBag.CurrentFilter as string ?? "All";
+}
+
+<div class="py-2">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+        <div>
+            <h1 class="h4 fw-bold mb-0">Assigned Deliveries Queue</h1>
+            <p class="text-muted small mb-0">Manage delivery dispatches, active runs & completed drops</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-area="Delivery" asp-controller="Order" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Pills / Tabs -->
+    <div class="d-flex flex-nowrap overflow-auto gap-2 pb-2 mb-3">
+        <a asp-area="Delivery" asp-controller="Order" asp-action="Index" asp-route-status="All"
+           class="btn btn-sm rounded-pill text-nowrap @(currentFilter == "All" ? "btn-dark fw-bold" : "btn-light border")">
+            All Orders (@Model.Count)
+        </a>
+        <a asp-area="Delivery" asp-controller="Order" asp-action="Index" asp-route-status="Assigned"
+           class="btn btn-sm rounded-pill text-nowrap @(currentFilter == "Assigned" ? "btn-info text-white fw-bold" : "btn-light border")">
+            <i class="bi bi-inbox me-1"></i> Assigned
+        </a>
+        <a asp-area="Delivery" asp-controller="Order" asp-action="Index" asp-route-status="Out for Delivery"
+           class="btn btn-sm rounded-pill text-nowrap @(currentFilter == "Out for Delivery" ? "btn-warning text-dark fw-bold" : "btn-light border")">
+            <i class="bi bi-bicycle me-1"></i> In Transit
+        </a>
+        <a asp-area="Delivery" asp-controller="Order" asp-action="Index" asp-route-status="Delivered"
+           class="btn btn-sm rounded-pill text-nowrap @(currentFilter == "Delivered" ? "btn-success fw-bold" : "btn-light border")">
+            <i class="bi bi-check-circle me-1"></i> Delivered
+        </a>
+        <a asp-area="Delivery" asp-controller="Order" asp-action="Index" asp-route-status="Delivery Failed"
+           class="btn btn-sm rounded-pill text-nowrap @(currentFilter == "Delivery Failed" ? "btn-danger fw-bold" : "btn-light border")">
+            <i class="bi bi-exclamation-triangle me-1"></i> Failed / Issues
+        </a>
+    </div>
+
+    <!-- Orders Cards / List -->
+    @if (Model.Any())
+    {
+        <div class="row g-3">
+            @foreach (var order in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="delivery-card p-3 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <!-- Header Row -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge @(order.OrderStatus == "Delivered" ? "badge-status-delivered" :
+                                                         order.OrderStatus == "Out for Delivery" ? "badge-status-outfordelivery" :
+                                                         order.OrderStatus == "Delivery Failed" ? "badge-status-failed" : "badge-status-assigned") px-2 py-0.5 rounded-pill small">
+                                        @order.OrderStatus
+                                    </span>
+                                    <h2 class="h6 fw-bold text-dark mt-1 mb-0">@order.OrderNumber</h2>
+                                    <span class="text-muted" style="font-size: 0.72rem;">@order.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-dark fs-5">₹@order.GrandTotal.ToString("N2")</div>
+                                    <span class="badge @(order.PaymentMethod == "COD" ? "bg-warning text-dark" : "bg-success")" style="font-size: 0.7rem;">
+                                        @order.PaymentMethod
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Customer & Address -->
+                            <div class="bg-light p-2.5 rounded-3 mb-3 small">
+                                <div class="fw-semibold text-dark mb-1 d-flex justify-content-between">
+                                    <span><i class="bi bi-person me-1 text-muted"></i>@order.CustomerName</span>
+                                    @if (!string.IsNullOrEmpty(order.CustomerPhone))
+                                    {
+                                        <a href="tel:@order.CustomerPhone" class="text-success text-decoration-none fw-bold">
+                                            <i class="bi bi-telephone-fill"></i> Call
+                                        </a>
+                                    }
+                                </div>
+                                <div class="text-muted mb-1 text-truncate-2">
+                                    <i class="bi bi-geo-alt me-1 text-danger"></i> @order.FullAddress
+                                </div>
+                                @if (order.DeliveryAttempts > 0)
+                                {
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle me-1"></i> Attempts: @order.DeliveryAttempts
+                                        @if (!string.IsNullOrEmpty(order.FailedReason))
+                                        {
+                                            <span>(@order.FailedReason)</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div class="d-flex gap-2 pt-2 border-top">
+                            <a asp-area="Delivery" asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-secondary flex-grow-1 py-1.5">
+                                <i class="bi bi-card-text me-1"></i> Waybill
+                            </a>
+
+                            @if (order.OrderStatus == "Out for Delivery")
+                            {
+                                <a asp-area="Delivery" asp-controller="Order" asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-success flex-grow-1 py-1.5 fw-semibold d-inline-flex align-items-center justify-content-center gap-1">
+                                    <i class="bi bi-shield-check"></i> OTP Deliver
+                                </a>
+                            }
+                            else if (order.OrderStatus == "Assigned" || order.OrderStatus == "Shipped" || order.OrderStatus == "Processing")
+                            {
+                                <form asp-area="Delivery" asp-controller="Order" asp-action="StartDelivery" method="post" class="flex-grow-1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@order.OrderId" />
+                                    <button type="submit" class="btn btn-sm btn-warning w-100 py-1.5 fw-semibold d-inline-flex align-items-center justify-content-center gap-1 text-dark">
+                                        <i class="bi bi-play-fill"></i> Start Run
+                                    </button>
+                                </form>
+                            }
+                            else if (order.OrderStatus == "Delivered")
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success d-inline-flex align-items-center justify-content-center px-3 py-1.5 rounded-pill small flex-grow-1">
+                                    <i class="bi bi-check-all me-1"></i> Completed
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="delivery-card p-5 text-center text-muted">
+            <i class="bi bi-search fs-1 opacity-50 mb-2"></i>
+            <h2 class="h6 fw-semibold">No orders match this filter</h2>
+            <p class="small text-muted mb-0">Try changing the filter above or check back when new orders are dispatched.</p>
+        </div>
+    }
+</div>

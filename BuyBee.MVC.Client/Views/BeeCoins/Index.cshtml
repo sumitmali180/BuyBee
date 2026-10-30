@@ -1,0 +1,333 @@
+@model EMart.ViewModels.BeeCoinsDashboardVM
+
+@{
+    ViewData["Title"] = "BeeCoins Rewards & Loyalty Passbook";
+}
+
+<div class="container py-4 py-md-5">
+    <!-- Breadcrumb & Top Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small text-muted">
+                    <li class="breadcrumb-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-area="" asp-controller="Account" asp-action="Profile" class="text-decoration-none text-muted">My Account</a></li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">BeeCoins Rewards</li>
+                </ol>
+            </nav>
+            <h1 class="h2 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <span class="fs-2">🪙</span>
+                <span>BeeCoins Loyalty Passbook</span>
+            </h1>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-controller="Reorder" asp-action="Index" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-2">
+                <i class="bi bi-arrow-repeat"></i>
+                <span>Smart Reorder</span>
+            </a>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-warning btn-sm text-dark fw-bold px-3 d-inline-flex align-items-center gap-2 shadow-sm">
+                <i class="bi bi-bag"></i>
+                <span>Shop & Earn More</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Golden Loyalty Card & Tier Overview -->
+    <div class="row g-4 mb-5">
+        <!-- Digital Membership Card -->
+        <div class="col-lg-6">
+            <div class="card border-0 rounded-4 shadow-lg p-4 position-relative overflow-hidden" 
+                 style="background: linear-gradient(135deg, #1e1b18 0%, #2e2615 40%, #523e0e 100%); color: #fff; min-height: 240px;">
+                <!-- Decorative Glow -->
+                <div class="position-absolute top-0 end-0 rounded-circle" 
+                     style="width: 250px; height: 250px; background: radial-gradient(circle, rgba(251,191,36,0.25) 0%, rgba(0,0,0,0) 70%); transform: translate(30%, -30%); pointer-events: none;"></div>
+                
+                <div class="d-flex justify-content-between align-items-start position-relative z-1 mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fs-3">🐝</span>
+                        <div>
+                            <div class="fw-bold fs-5 tracking-wide text-warning" style="letter-spacing: 1px;">BUYBEE REWARDS</div>
+                            <small class="text-white-50" style="font-size: 11px;">VIP Loyalty Club Member</small>
+                        </div>
+                    </div>
+                    <span class="badge @Model.Wallet.TierBadgeClass px-3 py-2 rounded-pill fs-6 fw-bold shadow-sm d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-patch-check-fill text-warning"></i> @Model.Wallet.TierName Tier
+                    </span>
+                </div>
+
+                <!-- Balance Display -->
+                <div class="my-auto py-2 position-relative z-1">
+                    <div class="small text-uppercase text-warning fw-semibold tracking-wider" style="font-size: 11px;">Available Balance</div>
+                    <div class="d-flex align-items-baseline gap-3">
+                        <div class="display-5 fw-extrabold text-white font-monospace">@Model.Wallet.Balance.ToString("N0")</div>
+                        <div class="fs-5 text-warning fw-bold">BeeCoins</div>
+                    </div>
+                    <div class="small text-white-50 mt-1">
+                        Equivalent Cash Discount: <strong class="text-warning">₹@Model.Wallet.ValueInRupees.ToString("N2")</strong> (1 Coin = ₹1.00)
+                    </div>
+                </div>
+
+                <!-- Card Footer Details -->
+                <div class="d-flex justify-content-between align-items-end pt-3 border-top border-secondary border-opacity-25 position-relative z-1" style="font-size: 12px;">
+                    <div>
+                        <div class="text-white-50">Member Name</div>
+                        <div class="fw-bold text-white">@(User.Identity?.Name ?? "Valued Shopper")</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-white-50">Redeemable At</div>
+                        <div class="text-warning fw-semibold">Checkout (Instant Discount)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tier Status & Milestones -->
+        <div class="col-lg-6">
+            <div class="card border rounded-4 shadow-sm p-4 h-100 bg-white d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                            <i class="bi bi-trophy-fill text-warning"></i>
+                            <span>Tier Milestone Progress</span>
+                        </h5>
+                        <span class="badge bg-light text-dark border">
+                            @Model.Wallet.TotalEarned Lifetime Coins Earned
+                        </span>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        @if (Model.Wallet.CoinsToNextTier > 0)
+                        {
+                            <span>Earn <strong>@Model.Wallet.CoinsToNextTier more BeeCoins</strong> to unlock <strong>@Model.Wallet.NextTierName Tier</strong> perks & multipliers!</span>
+                        }
+                        else
+                        {
+                            <span>🎉 Congratulations! You have reached the pinnacle <strong>Platinum VIP Tier</strong>.</span>
+                        }
+                    </p>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small text-muted mb-1 fw-semibold">
+                            <span>@Model.Wallet.TierName</span>
+                            <span>@(Model.Wallet.TierProgressPercentage)% to @Model.Wallet.NextTierName</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" 
+                                 style="width: @(Model.Wallet.TierProgressPercentage)%;" 
+                                 aria-valuenow="@Model.Wallet.TierProgressPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tier Breakdown Cards -->
+                    <div class="row g-2 text-center pt-2">
+                        <div class="col-3">
+                            <div class="p-2 rounded-3 border @(Model.Wallet.TierName == "Bronze" ? "bg-warning bg-opacity-10 border-warning" : "bg-light")">
+                                <div class="fw-bold small text-dark">Bronze</div>
+                                <div class="text-muted" style="font-size: 10px;">0+ Coins</div>
+                                <div class="text-success fw-semibold" style="font-size: 9px;">1x Coins</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2 rounded-3 border @(Model.Wallet.TierName == "Silver" ? "bg-warning bg-opacity-10 border-warning" : "bg-light")">
+                                <div class="fw-bold small text-dark">Silver</div>
+                                <div class="text-muted" style="font-size: 10px;">500+ Coins</div>
+                                <div class="text-success fw-semibold" style="font-size: 9px;">1.2x Coins</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2 rounded-3 border @(Model.Wallet.TierName == "Gold" ? "bg-warning bg-opacity-10 border-warning" : "bg-light")">
+                                <div class="fw-bold small text-dark">Gold</div>
+                                <div class="text-muted" style="font-size: 10px;">2,000+ Coins</div>
+                                <div class="text-success fw-semibold" style="font-size: 9px;">1.5x Coins</div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="p-2 rounded-3 border @(Model.Wallet.TierName == "Platinum" ? "bg-warning bg-opacity-10 border-warning" : "bg-light")">
+                                <div class="fw-bold small text-dark">Platinum</div>
+                                <div class="text-muted" style="font-size: 10px;">5,000+ Coins</div>
+                                <div class="text-success fw-semibold" style="font-size: 9px;">2x Coins VIP</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
+                    <div class="small text-muted">
+                        <i class="bi bi-shield-check text-success me-1"></i> Coins never expire for active accounts
+                    </div>
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-dark btn-sm px-3">
+                        Shop Now &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border rounded-3 p-3 bg-white shadow-sm">
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 11px;">Current Balance</div>
+                <div class="fs-4 fw-bold text-dark mt-1 font-monospace">@Model.Wallet.Balance <span class="text-warning small fs-6">Coins</span></div>
+                <div class="text-success small mt-1">₹@Model.Wallet.ValueInRupees.ToString("N2") Value</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border rounded-3 p-3 bg-white shadow-sm">
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 11px;">Lifetime Earned</div>
+                <div class="fs-4 fw-bold text-dark mt-1 font-monospace">@Model.Wallet.TotalEarned <span class="text-muted small fs-6">Coins</span></div>
+                <div class="text-muted small mt-1">Across all purchases</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border rounded-3 p-3 bg-white shadow-sm">
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 11px;">Lifetime Savings</div>
+                <div class="fs-4 fw-bold text-success mt-1 font-monospace">₹@Model.LifetimeSavings.ToString("N2")</div>
+                <div class="text-muted small mt-1">Saved at checkout</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border rounded-3 p-3 bg-white shadow-sm">
+                <div class="text-muted small text-uppercase fw-semibold" style="font-size: 11px;">Coin Earning Rate</div>
+                <div class="fs-4 fw-bold text-amber mt-1">5% Rewards</div>
+                <div class="text-muted small mt-1">5 Coins on every ₹100</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passbook / Transaction History -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden mb-5 bg-white">
+        <div class="p-3 px-4 border-bottom bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-amber"></i>
+                    <span>BeeCoins Activity Ledger</span>
+                </h5>
+                <small class="text-muted">Itemized audit history of all coins credited and redeemed</small>
+            </div>
+            <span class="badge bg-white text-secondary border px-3 py-2">
+                @Model.Transactions.Count Transactions
+            </span>
+        </div>
+
+        @if (Model.Transactions.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-uppercase text-muted">
+                        <tr>
+                            <th class="ps-4 py-3">Date & Time</th>
+                            <th class="py-3">Activity / Description</th>
+                            <th class="py-3 text-center">Type</th>
+                            <th class="py-3 text-center">Reference</th>
+                            <th class="py-3 text-end">Coins</th>
+                            <th class="pe-4 py-3 text-end">Balance After</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tx in Model.Transactions)
+                        {
+                            <tr>
+                                <td class="ps-4 py-3 text-secondary small">
+                                    @tx.CreatedOn.ToString("dd MMM yyyy, hh:mm tt")
+                                </td>
+                                <td class="py-3">
+                                    <div class="fw-semibold text-dark">@tx.Description</div>
+                                </td>
+                                <td class="py-3 text-center">
+                                    @if (tx.TransactionType == "WelcomeBonus")
+                                    {
+                                        <span class="badge bg-primary text-white">🎁 Welcome Gift</span>
+                                    }
+                                    else if (tx.TransactionType == "Earned")
+                                    {
+                                        <span class="badge bg-success">⭐ Purchase Reward</span>
+                                    }
+                                    else if (tx.TransactionType == "Redeemed")
+                                    {
+                                        <span class="badge bg-warning text-dark">🛍️ Checkout Discount</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@tx.TransactionType</span>
+                                    }
+                                </td>
+                                <td class="py-3 text-center">
+                                    @if (tx.OrderId.HasValue && tx.OrderId.Value > 0)
+                                    {
+                                        <a asp-controller="Order" asp-action="Details" asp-route-id="@tx.OrderId.Value" class="text-decoration-none font-monospace small fw-bold">
+                                            @(tx.OrderNumber ?? $"#ORD-{tx.OrderId.Value}")
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">--</span>
+                                    }
+                                </td>
+                                <td class="py-3 text-end fw-bold font-monospace">
+                                    @if (tx.IsCredit)
+                                    {
+                                        <span class="text-success">+@tx.Coins</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">@tx.Coins</span>
+                                    }
+                                </td>
+                                <td class="pe-4 py-3 text-end text-muted font-monospace">
+                                    @tx.BalanceAfter
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-5 text-center">
+                <i class="bi bi-wallet2 text-warning display-4 d-block mb-3 opacity-50"></i>
+                <h5 class="fw-bold mb-1">No Transactions Recorded Yet</h5>
+                <p class="text-muted small mb-3">Place your first order to start earning 5 BeeCoins on every ₹100 spent!</p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-warning text-dark fw-bold px-4">
+                    Explore Catalog
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Explanatory "How BeeCoins Work" Section -->
+    <div class="card border rounded-4 p-4 p-md-5 bg-light">
+        <h4 class="fw-bold mb-4 text-center text-dark">How BeeCoins Loyalty Works</h4>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="rounded-circle bg-warning bg-opacity-20 d-inline-flex align-items-center justify-content-center p-3 text-warning fs-2 mb-3">
+                    <i class="bi bi-cart-check-fill"></i>
+                </div>
+                <h6 class="fw-bold text-dark">1. Shop & Earn 5% Back</h6>
+                <p class="text-muted small mb-0">
+                    Earn 5 BeeCoins for every ₹100 spent on all orders. The more you buy, the higher your tier multiplier gets.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <div class="rounded-circle bg-warning bg-opacity-20 d-inline-flex align-items-center justify-content-center p-3 text-warning fs-2 mb-3">
+                    <i class="bi bi-currency-rupee"></i>
+                </div>
+                <h6 class="fw-bold text-dark">2. 1 BeeCoin = ₹1 Instant Value</h6>
+                <p class="text-muted small mb-0">
+                    No complicated conversions or blackout dates. 100 BeeCoins gives you ₹100 flat discount off your order total.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <div class="rounded-circle bg-warning bg-opacity-20 d-inline-flex align-items-center justify-content-center p-3 text-warning fs-2 mb-3">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <h6 class="fw-bold text-dark">3. 1-Click Redeem at Checkout</h6>
+                <p class="text-muted small mb-0">
+                    Simply tick the "Use BeeCoins" checkbox during checkout to instantly reduce your grand total. Combine with promo coupons!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

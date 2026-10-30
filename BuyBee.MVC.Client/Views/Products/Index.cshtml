@@ -1,0 +1,361 @@
+@model EMart.ViewModels.ProductCatalogVM
+
+@{
+    ViewData["Title"] = !string.IsNullOrEmpty(Model.SelectedCategoryName)
+        ? $"{Model.SelectedCategoryName} Products - Buybee"
+        : !string.IsNullOrEmpty(Model.SelectedBrandName)
+            ? $"{Model.SelectedBrandName} Products - Buybee"
+            : !string.IsNullOrEmpty(Model.SearchText)
+                ? $"Search results for \"{Model.SearchText}\" - Buybee"
+                : "All Products - Buybee";
+
+    int totalPages = Model.Products.TotalPages;
+    int currentPage = Model.Products.PageNumber;
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index">Products</a></li>
+            @if (!string.IsNullOrEmpty(Model.SelectedCategoryName))
+            {
+                <li class="breadcrumb-item active" aria-current="page">@Model.SelectedCategoryName</li>
+            }
+            else if (!string.IsNullOrEmpty(Model.SelectedBrandName))
+            {
+                <li class="breadcrumb-item active" aria-current="page">@Model.SelectedBrandName</li>
+            }
+            else if (!string.IsNullOrEmpty(Model.SearchText))
+            {
+                <li class="breadcrumb-item active" aria-current="page">Search: @Model.SearchText</li>
+            }
+        </ol>
+    </nav>
+
+    <!-- Header & Controls -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h2 fw-bold mb-1">
+                @if (!string.IsNullOrEmpty(Model.SelectedCategoryName))
+                {
+                    <span>@Model.SelectedCategoryName</span>
+                }
+                else if (!string.IsNullOrEmpty(Model.SelectedBrandName))
+                {
+                    <span>@Model.SelectedBrandName</span>
+                }
+                else if (!string.IsNullOrEmpty(Model.SearchText))
+                {
+                    <span>Results for "@Model.SearchText"</span>
+                }
+                else
+                {
+                    <span>Complete Product Catalog</span>
+                }
+            </h1>
+            <p class="text-muted mb-0 small">
+                Displaying @Model.Products.Items.Count() of @Model.Products.TotalRecords products
+            </p>
+        </div>
+
+        <!-- Sorting Selector -->
+        <form method="get" asp-controller="Products" asp-action="Index" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="searchText" value="@Model.SearchText" />
+            <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+            <input type="hidden" name="brandId" value="@Model.SelectedBrandId" />
+            <input type="hidden" name="minPrice" value="@Model.MinPrice" />
+            <input type="hidden" name="maxPrice" value="@Model.MaxPrice" />
+
+            <label for="sortBy" class="text-muted small fw-semibold text-nowrap">Sort:</label>
+            <select name="sortBy" id="sortBy" class="form-select form-select-sm" style="min-width: 180px;" onchange="this.form.submit()">
+                <option value="newest" selected="@(Model.SortBy == "newest" ? "selected" : null)">Newest Arrivals</option>
+                <option value="price_asc" selected="@(Model.SortBy == "price_asc" ? "selected" : null)">Price: Low to High</option>
+                <option value="price_desc" selected="@(Model.SortBy == "price_desc" ? "selected" : null)">Price: High to Low</option>
+                <option value="name_asc" selected="@(Model.SortBy == "name_asc" ? "selected" : null)">Name: A to Z</option>
+                <option value="name_desc" selected="@(Model.SortBy == "name_desc" ? "selected" : null)">Name: Z to A</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Active Filter Chips -->
+    @if (!string.IsNullOrEmpty(Model.SelectedCategoryName) || !string.IsNullOrEmpty(Model.SelectedBrandName) || !string.IsNullOrEmpty(Model.SearchText) || Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+    {
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-4 p-3 bg-white border rounded-3">
+            <span class="text-muted small fw-bold me-1">
+                <i class="bi bi-funnel-fill text-warning me-1"></i>Active:
+            </span>
+
+            @if (!string.IsNullOrEmpty(Model.SearchText))
+            {
+                <span class="badge bg-light text-dark border d-inline-flex align-items-center gap-1">
+                    Keyword: @Model.SearchText
+                    <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-brandId="@Model.SelectedBrandId" asp-route-sortBy="@Model.SortBy" class="text-danger"><i class="bi bi-x"></i></a>
+                </span>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SelectedCategoryName))
+            {
+                <span class="badge bg-light text-dark border d-inline-flex align-items-center gap-1">
+                    Category: @Model.SelectedCategoryName
+                    <a asp-controller="Products" asp-action="Index" asp-route-searchText="@Model.SearchText" asp-route-brandId="@Model.SelectedBrandId" asp-route-sortBy="@Model.SortBy" class="text-danger"><i class="bi bi-x"></i></a>
+                </span>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SelectedBrandName))
+            {
+                <span class="badge bg-light text-dark border d-inline-flex align-items-center gap-1">
+                    Brand: @Model.SelectedBrandName
+                    <a asp-controller="Products" asp-action="Index" asp-route-searchText="@Model.SearchText" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-sortBy="@Model.SortBy" class="text-danger"><i class="bi bi-x"></i></a>
+                </span>
+            }
+
+            @if (Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+            {
+                <span class="badge bg-light text-dark border d-inline-flex align-items-center gap-1">
+                    Price: ₹@(Model.MinPrice ?? 0) - ₹@(Model.MaxPrice ?? 100000)
+                    <a asp-controller="Products" asp-action="Index" asp-route-searchText="@Model.SearchText" asp-route-categoryId="@Model.SelectedCategoryId" asp-route-brandId="@Model.SelectedBrandId" asp-route-sortBy="@Model.SortBy" class="text-danger"><i class="bi bi-x"></i></a>
+                </span>
+            }
+
+            <a asp-controller="Products" asp-action="Index" class="btn btn-link btn-sm text-danger text-decoration-none ms-auto py-0">Reset All</a>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Filter Sidebar -->
+        <div class="col-lg-3">
+            <div class="card border p-3" style="position: sticky; top: 85px;">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <h5 class="fw-bold mb-0 text-dark h6">
+                        <i class="bi bi-sliders me-2 text-warning"></i>Refine Search
+                    </h5>
+                    <a asp-controller="Products" asp-action="Index" class="text-muted small">Clear</a>
+                </div>
+
+                <!-- Categories -->
+                <div class="mb-3">
+                    <div class="fw-bold text-uppercase text-muted small mb-2" style="font-size: 0.75rem;">Categories</div>
+                    <div class="d-flex flex-column gap-1" style="max-height: 220px; overflow-y: auto;">
+                        <a asp-controller="Products" asp-action="Index"
+                           asp-route-searchText="@Model.SearchText"
+                           asp-route-brandId="@Model.SelectedBrandId"
+                           asp-route-sortBy="@Model.SortBy"
+                           class="d-flex justify-content-between align-items-center p-2 rounded-2 text-decoration-none small @(Model.SelectedCategoryId == null ? "bg-warning bg-opacity-25 text-dark fw-bold" : "text-secondary")">
+                            <span>All Categories</span>
+                        </a>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <a asp-controller="Products" asp-action="Index"
+                               asp-route-categoryId="@cat.CategoryId"
+                               asp-route-searchText="@Model.SearchText"
+                               asp-route-brandId="@Model.SelectedBrandId"
+                               asp-route-sortBy="@Model.SortBy"
+                               class="d-flex justify-content-between align-items-center p-2 rounded-2 text-decoration-none small @(Model.SelectedCategoryId == cat.CategoryId ? "bg-warning bg-opacity-25 text-dark fw-bold" : "text-secondary")">
+                                <span>@cat.CategoryName</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <hr class="my-2" />
+
+                <!-- Brands -->
+                <div class="mb-3">
+                    <div class="fw-bold text-uppercase text-muted small mb-2" style="font-size: 0.75rem;">Brands</div>
+                    <div class="d-flex flex-column gap-1" style="max-height: 200px; overflow-y: auto;">
+                        <a asp-controller="Products" asp-action="Index"
+                           asp-route-searchText="@Model.SearchText"
+                           asp-route-categoryId="@Model.SelectedCategoryId"
+                           asp-route-sortBy="@Model.SortBy"
+                           class="d-flex justify-content-between align-items-center p-2 rounded-2 text-decoration-none small @(Model.SelectedBrandId == null ? "bg-warning bg-opacity-25 text-dark fw-bold" : "text-secondary")">
+                            <span>All Brands</span>
+                        </a>
+                        @foreach (var brand in Model.Brands)
+                        {
+                            <a asp-controller="Products" asp-action="Index"
+                               asp-route-brandId="@brand.BrandId"
+                               asp-route-categoryId="@Model.SelectedCategoryId"
+                               asp-route-searchText="@Model.SearchText"
+                               asp-route-sortBy="@Model.SortBy"
+                               class="d-flex justify-content-between align-items-center p-2 rounded-2 text-decoration-none small @(Model.SelectedBrandId == brand.BrandId ? "bg-warning bg-opacity-25 text-dark fw-bold" : "text-secondary")">
+                                <span>@brand.BrandName</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <hr class="my-2" />
+
+                <!-- Price Filter -->
+                <form method="get" asp-controller="Products" asp-action="Index">
+                    <input type="hidden" name="searchText" value="@Model.SearchText" />
+                    <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+                    <input type="hidden" name="brandId" value="@Model.SelectedBrandId" />
+                    <input type="hidden" name="sortBy" value="@Model.SortBy" />
+
+                    <div class="mb-2">
+                        <div class="fw-bold text-uppercase text-muted small mb-2" style="font-size: 0.75rem;">Price Range (₹)</div>
+                        <div class="d-flex align-items-center gap-1 mb-2">
+                            <input type="number" name="minPrice" value="@Model.MinPrice" placeholder="Min" class="form-control form-control-sm" min="0" />
+                            <span class="text-muted">-</span>
+                            <input type="number" name="maxPrice" value="@Model.MaxPrice" placeholder="Max" class="form-control form-control-sm" min="0" />
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                            Apply Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="col-lg-9">
+            @if (Model.Products != null && Model.Products.Items != null && Model.Products.Items.Any())
+            {
+                <div class="row row-cols-2 row-cols-md-3 g-3 g-md-4">
+                    @foreach (var product in Model.Products.Items)
+                    {
+                        <div class="col">
+                            <div class="bb-product-card">
+                                <div class="bb-product-thumb-wrap">
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" class="d-contents">
+                                        <img src="@(string.IsNullOrEmpty(product.ThumbnailImage) ? "/images/no-image.png" : product.ThumbnailImage)"
+                                             class="bb-product-thumb"
+                                             loading="lazy"
+                                             alt="@product.ProductName"
+                                             onerror="this.onerror=null;this.src='/images/no-image.png'" />
+                                    </a>
+                                    @if (product.Quantity <= 0)
+                                    {
+                                        <div class="bb-product-badge-group">
+                                            <span class="badge bg-danger">Sold Out</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="bb-product-content">
+                                    @if (!string.IsNullOrEmpty(product.BrandName))
+                                    {
+                                        <div class="bb-product-brand">@product.BrandName</div>
+                                    }
+
+                                    <h3 class="bb-product-title">
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId">
+                                            @product.ProductName
+                                        </a>
+                                    </h3>
+
+                                    <div class="bb-product-rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-half"></i>
+                                        <span class="bb-product-rating-count">(4.6)</span>
+                                    </div>
+
+                                    <div class="bb-product-pricing">
+                                        <span class="bb-product-price">₹@(product.Price?.ToString("N2") ?? "0.00")</span>
+                                    </div>
+
+                                    <div class="bb-product-actions">
+                                        @if (product.Quantity > 0)
+                                        {
+                                            <form asp-controller="Cart"
+                                                  asp-action="AddToCart"
+                                                  method="post"
+                                                  class="add-to-cart-form w-100">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@product.ProductId" />
+                                                <input type="hidden" name="quantity" value="1" />
+                                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                    <i class="bi bi-bag-plus me-1"></i> Add to Bag
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>
+                                                Out of Stock
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (totalPages > 1)
+                {
+                    <nav class="mt-5 d-flex justify-content-center" aria-label="Catalog pagination">
+                        <ul class="pagination">
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-controller="Products"
+                                   asp-action="Index"
+                                   asp-route-searchText="@Model.SearchText"
+                                   asp-route-categoryId="@Model.SelectedCategoryId"
+                                   asp-route-brandId="@Model.SelectedBrandId"
+                                   asp-route-minPrice="@Model.MinPrice"
+                                   asp-route-maxPrice="@Model.MaxPrice"
+                                   asp-route-sortBy="@Model.SortBy"
+                                   asp-route-pageNumber="@(currentPage - 1)">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @for (int p = 1; p <= totalPages; p++)
+                            {
+                                <li class="page-item @(p == currentPage ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-controller="Products"
+                                       asp-action="Index"
+                                       asp-route-searchText="@Model.SearchText"
+                                       asp-route-categoryId="@Model.SelectedCategoryId"
+                                       asp-route-brandId="@Model.SelectedBrandId"
+                                       asp-route-minPrice="@Model.MinPrice"
+                                       asp-route-maxPrice="@Model.MaxPrice"
+                                       asp-route-sortBy="@Model.SortBy"
+                                       asp-route-pageNumber="@p">
+                                        @p
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-controller="Products"
+                                   asp-action="Index"
+                                   asp-route-searchText="@Model.SearchText"
+                                   asp-route-categoryId="@Model.SelectedCategoryId"
+                                   asp-route-brandId="@Model.SelectedBrandId"
+                                   asp-route-minPrice="@Model.MinPrice"
+                                   asp-route-maxPrice="@Model.MaxPrice"
+                                   asp-route-sortBy="@Model.SortBy"
+                                   asp-route-pageNumber="@(currentPage + 1)">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <!-- Empty State -->
+                <div class="text-center py-5 bg-white rounded-3 border p-5">
+                    <i class="bi bi-search fs-1 text-muted opacity-50 d-block mb-3"></i>
+                    <h4 class="fw-bold mb-2">No Products Found</h4>
+                    <p class="text-muted small mb-4">We could not find any products matching your active filters.</p>
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-primary">
+                        <i class="bi bi-arrow-repeat me-1"></i> Reset Filters
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

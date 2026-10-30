@@ -1,0 +1,872 @@
+/* ==========================================================================
+   Buybee AI Assistant Stylesheet
+   Designed for /ai page and bottom-right floating widget
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Floating AI Assistant Widget (Bottom-Right)
+   -------------------------------------------------------------------------- */
+.bb-ai-launcher {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bb-ai-launcher-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #09090b;
+    border: none;
+    box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.45), 0 8px 10px -6px rgba(245, 158, 11, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    outline: none;
+}
+
+.bb-ai-launcher-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 14px 30px -4px rgba(245, 158, 11, 0.6);
+    color: #000;
+}
+
+.bb-ai-launcher-btn .bb-pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #fbbf24;
+    animation: bbPulse 2.2s infinite cubic-bezier(0.24, 0, 0.38, 1);
+    pointer-events: none;
+}
+
+@keyframes bbPulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    70% { transform: scale(1.4); opacity: 0; }
+    100% { transform: scale(1.4); opacity: 0; }
+}
+
+.bb-ai-launcher-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    background: #09090b;
+    color: #fbbf24;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    border: 1.5px solid #fbbf24;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bb-ai-tooltip {
+    background: #09090b;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    opacity: 0;
+    transform: translateX(10px);
+    pointer-events: none;
+    transition: all 0.25s ease;
+}
+
+.bb-ai-launcher:hover .bb-ai-tooltip {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* --------------------------------------------------------------------------
+   2. Floating Chat Window
+   -------------------------------------------------------------------------- */
+.bb-ai-window {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 410px;
+    max-width: calc(100vw - 32px);
+    height: 620px;
+    max-height: calc(100vh - 120px);
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    z-index: 10000;
+    overflow: hidden;
+    transform-origin: bottom right;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.bb-ai-window.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: all;
+    visibility: visible;
+}
+
+/* Chat Header */
+.bb-ai-header {
+    background: #09090b;
+    color: #ffffff;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+}
+
+.bb-ai-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, transparent);
+}
+
+.bb-ai-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bb-ai-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #09090b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.bb-ai-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bb-ai-status {
+    font-size: 11px;
+    color: #a1a1aa;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.bb-ai-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    display: inline-block;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.bb-ai-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bb-ai-action-btn {
+    background: transparent;
+    border: none;
+    color: #a1a1aa;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.bb-ai-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Chat Messages Area */
+.bb-ai-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #f8fafc;
+    scroll-behavior: smooth;
+}
+
+.bb-ai-msg {
+    display: flex;
+    gap: 10px;
+    max-width: 88%;
+    animation: bbFadeInUp 0.25s ease-out forwards;
+}
+
+@keyframes bbFadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bb-ai-msg.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.bb-ai-msg.assistant {
+    align-self: flex-start;
+}
+
+.bb-ai-msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.bb-ai-msg.user .bb-ai-msg-avatar {
+    background: #09090b;
+    color: #fff;
+}
+
+.bb-ai-msg.assistant .bb-ai-msg-avatar {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.bb-ai-bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    position: relative;
+    word-break: break-word;
+}
+
+.bb-ai-msg.user .bb-ai-bubble {
+    background: #09090b;
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+}
+
+.bb-ai-msg.assistant .bb-ai-bubble {
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.bb-ai-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.bb-ai-bubble ul, .bb-ai-bubble ol {
+    margin: 6px 0;
+    padding-left: 18px;
+}
+
+.bb-ai-tool-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-bottom: 8px;
+    border: 1px solid #fde68a;
+}
+
+/* Product Cards Carousel / Grid in Chat */
+.bb-ai-product-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.bb-ai-product-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.bb-ai-product-card:hover {
+    border-color: #fbbf24;
+    box-shadow: 0 6px 14px -3px rgba(245, 158, 11, 0.15);
+}
+
+.bb-ai-product-thumb {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f8fafc;
+    flex-shrink: 0;
+    border: 1px solid #f1f5f9;
+}
+
+.bb-ai-product-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.bb-ai-product-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.35;
+    text-decoration: none;
+}
+
+.bb-ai-product-title:hover {
+    color: #d97706;
+}
+
+.bb-ai-product-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.bb-ai-product-price {
+    font-size: 14px;
+    font-weight: 800;
+    color: #09090b;
+}
+
+.bb-ai-stock-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 9999px;
+}
+
+.bb-ai-stock-in {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.bb-ai-stock-out {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.bb-ai-product-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.bb-ai-btn-cart {
+    flex: 1;
+    background: #f59e0b;
+    color: #09090b;
+    border: none;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.bb-ai-btn-cart:hover {
+    background: #d97706;
+    color: #ffffff;
+}
+
+.bb-ai-btn-view {
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    transition: all 0.2s ease;
+}
+
+.bb-ai-btn-view:hover {
+    background: #e2e8f0;
+    color: #09090b;
+}
+
+/* Suggestion Pills */
+.bb-ai-suggestions {
+    padding: 8px 16px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+    scrollbar-width: none;
+}
+
+.bb-ai-suggestions::-webkit-scrollbar {
+    display: none;
+}
+
+.bb-ai-pill {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bb-ai-pill:hover {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+    transform: translateY(-1px);
+}
+
+/* Chat Input Bar */
+.bb-ai-input-bar {
+    padding: 12px 14px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bb-ai-input {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 9px 14px;
+    font-size: 13.5px;
+    color: #0f172a;
+    outline: none;
+    transition: all 0.2s ease;
+    resize: none;
+    max-height: 80px;
+}
+
+.bb-ai-input:focus {
+    background: #ffffff;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.bb-ai-btn-mic {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.bb-ai-btn-mic:hover {
+    background: #e2e8f0;
+    color: #09090b;
+}
+
+.bb-ai-btn-mic.listening {
+    background: #ef4444;
+    color: #ffffff;
+    animation: bbMicPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes bbMicPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+    100% { transform: scale(1); }
+}
+
+.bb-ai-btn-send {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #09090b;
+    color: #fbbf24;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.bb-ai-btn-send:hover {
+    background: #f59e0b;
+    color: #09090b;
+    transform: scale(1.05);
+}
+
+.bb-ai-btn-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Typing Indicator */
+.bb-ai-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    width: fit-content;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.bb-ai-typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f59e0b;
+    animation: bbTyping 1.4s infinite ease-in-out;
+}
+
+.bb-ai-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.bb-ai-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bbTyping {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+
+/* --------------------------------------------------------------------------
+   3. Dedicated Full Page /ai Section
+   -------------------------------------------------------------------------- */
+.bb-ai-page {
+    min-height: calc(100vh - 180px);
+    background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+    padding: 30px 0 60px 0;
+}
+
+.bb-ai-hero-card {
+    background: #09090b;
+    color: #ffffff;
+    border-radius: 24px;
+    padding: 36px 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -10px rgba(9, 9, 11, 0.35);
+}
+
+.bb-ai-hero-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+}
+
+.bb-ai-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 9999px;
+    color: #fbbf24;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+.bb-ai-hero-title {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.bb-ai-hero-title span {
+    color: #fbbf24;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bb-ai-hero-subtitle {
+    font-size: 15px;
+    color: #a1a1aa;
+    max-width: 680px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.bb-ai-quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.bb-ai-quick-tag {
+    background: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bb-ai-quick-tag:hover {
+    background: #f59e0b;
+    color: #09090b;
+    border-color: #f59e0b;
+    transform: translateY(-2px);
+}
+
+/* Full Page Chat Container */
+.bb-ai-main-container {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    height: 700px;
+    overflow: hidden;
+}
+
+.bb-ai-page-messages {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: #f8fafc;
+}
+
+.bb-ai-page-messages .bb-ai-msg {
+    max-width: 80%;
+}
+
+.bb-ai-page-messages .bb-ai-bubble {
+    font-size: 14.5px;
+    padding: 16px 20px;
+}
+
+/* Responsive Product Grid in Full Page */
+.bb-ai-page-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+    width: 100%;
+}
+
+.bb-ai-page-product-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.bb-ai-page-product-card:hover {
+    border-color: #f59e0b;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -6px rgba(245, 158, 11, 0.2);
+}
+
+.bb-ai-page-thumb-wrap {
+    width: 100%;
+    height: 160px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f8fafc;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bb-ai-page-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.bb-ai-page-product-card:hover .bb-ai-page-thumb {
+    transform: scale(1.05);
+}
+
+.bb-ai-sidebar-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+}
+
+.bb-ai-sidebar-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bb-ai-tool-badge-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #334155;
+    border: 1px solid #f1f5f9;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .bb-ai-window {
+        right: 12px;
+        bottom: 84px;
+        width: calc(100vw - 24px);
+        height: calc(100vh - 100px);
+    }
+
+    .bb-ai-launcher {
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .bb-ai-launcher-btn {
+        width: 52px;
+        height: 52px;
+        font-size: 22px;
+    }
+
+    .bb-ai-hero-card {
+        padding: 24px 20px;
+    }
+
+    .bb-ai-hero-title {
+        font-size: 24px;
+    }
+
+    .bb-ai-main-container {
+        height: 600px;
+    }
+
+    .bb-ai-page-products {
+        grid-template-columns: 1fr;
+    }
+}

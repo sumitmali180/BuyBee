@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <rect x="15" y="12" width="170" height="36" rx="18" fill="#F40009"/>
+  <text x="100" y="37" font-family="'Brush Script MT', 'Bickham Script Pro', cursive, serif" font-size="26" font-weight="bold" font-style="italic" fill="#ffffff" text-anchor="middle">Coca-Cola</text>
+</svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#ffffff"/>
+  <path d="M40 18l6 8 8-10 8 10 6-8v16H40z" fill="#C8102E" opacity="0.9"/>
+  <text x="116" y="37" font-family="Arial Black, Impact, sans-serif" font-size="22" font-weight="900" fill="#C8102E" text-anchor="middle" letter-spacing="1">Prestige</text>
+</svg>
